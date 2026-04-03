@@ -1,6 +1,9 @@
-namespace API.Models;
+namespace API.Models.Tables;
 
-public class Goods
+/// <summary>
+/// Информация о товаре
+/// </summary>
+public class Good
 {
     public virtual int Id { get; set; }
     

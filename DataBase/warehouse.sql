@@ -22,7 +22,6 @@ CREATE TABLE staff (
     position_id INT NOT NULL REFERENCES positions(id) ON DELETE RESTRICT,
     full_name VARCHAR(50) NOT NULL,
     tin VARCHAR(12) UNIQUE NOT NULL,
-    UNIQUE (warehouse_id, tin)
 );
 
 CREATE TABLE goods (
@@ -30,7 +29,8 @@ CREATE TABLE goods (
     code VARCHAR(15) UNIQUE NOT NULL,
     nomenclature_number VARCHAR(5) NOT NULL,
     name VARCHAR(200) NOT NULL,
-    price NUMERIC(9, 2) NOT NULL
+    price NUMERIC(9, 2) NOT null
+    UNIQUE (nomenclature_number, name)
 );
 
 CREATE TABLE balances (
@@ -84,15 +84,6 @@ CREATE INDEX idx_invoice_goods ON invoice(goods_id);
 CREATE INDEX idx_invoice_date ON invoice(date);
 */
 
-CREATE VIEW staff_info AS
-SELECT 
-    id,
-    full_name,
-    tin,
-    warehouse_id
-FROM staff
-ORDER BY full_name;
-
 CREATE VIEW balances_details AS
 SELECT 
     b.id,
@@ -123,6 +114,7 @@ ORDER BY i.date DESC;
 
 CREATE VIEW warehouse_totals AS
 SELECT 
+	w.id,
     w.name AS warehouse_name,
     COUNT(b.goods_id) AS unique_goods_count,
     SUM(b.quantity) AS total_items

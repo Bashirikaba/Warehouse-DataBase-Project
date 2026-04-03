@@ -1,5 +1,8 @@
-namespace API.Models;
+namespace API.Models.Tables;
 
+/// <summary>
+/// Должность
+/// </summary>
 public class Position
 {
     public virtual int Id { get; set; }

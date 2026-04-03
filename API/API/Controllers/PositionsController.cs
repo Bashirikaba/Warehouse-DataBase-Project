@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Data;
-using API.Models;
+using API.Models.Tables;
 using NHibernate.Linq;
 
 namespace API.Controllers;
@@ -19,14 +19,14 @@ public class PositionsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var positions = await _unitOfWork.Query<Position>().ToListAsync<Position>();
+        var positions = await _unitOfWork.Query<Position>().ToListAsync();
         return Ok(positions);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        var position = await _unitOfWork.Query<Position>().FirstOrDefaultAsync<Position>(p => p.Id == id);
+        var position = await _unitOfWork.Query<Position>().FirstOrDefaultAsync(p => p.Id == id);
         if (position == null)
             return NotFound();
         return Ok(position);
@@ -83,7 +83,7 @@ public class PositionsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var position = await _unitOfWork.Query<Position>().FirstOrDefaultAsync<Position>(p => p.Id == id);
+        var position = await _unitOfWork.Query<Position>().FirstOrDefaultAsync(p => p.Id == id);
         if (position == null)
             return NotFound();
 

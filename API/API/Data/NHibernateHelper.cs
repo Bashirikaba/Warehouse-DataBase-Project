@@ -1,4 +1,4 @@
-using API.Mappings;
+using API.Mappings.Tables;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Dialect;
