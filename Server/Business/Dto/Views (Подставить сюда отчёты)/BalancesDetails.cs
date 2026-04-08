@@ -1,9 +1,9 @@
-namespace Business.Models;
-
+namespace Business.Dto;
+!!!ПОДСТАВИТЬ СЮДА ОТЧЕТЫ вместо этих вьюшек
 /// <summary>
 /// Детальная информация об остатках товара
 /// </summary>
-public class BalancesDetails
+public class BalancesDetailsDto
 {
     public virtual int Id {get;set;}
 

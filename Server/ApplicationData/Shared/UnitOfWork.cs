@@ -1,20 +1,25 @@
-using Data.Interfaces;
+using ApplicationData.Infrastructure;
 using NHibernate;
 
-namespace Data.Classes;
+namespace ApplicationData.Shared;
 
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ISession _session;
-
-    private ITransaction _transaction;
-
+    private ITransaction? _transaction;
     private readonly Dictionary<Type, object> _repositories = [];
 
     public UnitOfWork(ISession session)
     {
         _session = session;
-        _transaction = _session.BeginTransaction();
+    }
+
+    public void BeginTransaction()
+    {
+        if (_transaction == null || !_transaction.IsActive)
+        {
+            _transaction = _session.BeginTransaction();
+        }
     }
 
     public IRepository<T> GetRepository<T>() where T : class
@@ -26,12 +31,14 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task CommitAsync()
     {
-        await _transaction.CommitAsync();
+        if (_transaction != null && _transaction.IsActive)
+            await _transaction.CommitAsync();
     }
 
     public async Task RollbackAsync()
     {
-        await _transaction.RollbackAsync();
+        if (_transaction != null && _transaction.IsActive)
+            await _transaction.RollbackAsync();
     }
 
     public void Dispose()

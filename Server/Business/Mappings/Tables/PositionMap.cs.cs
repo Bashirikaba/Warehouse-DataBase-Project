@@ -1,8 +1,8 @@
-using Business.Models.Tables;
+using Business.Models;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 
-namespace Business.Mappings.Tables;
+namespace Business.Mappings;
 
 public class PositionMap : ClassMapping<Position>
 {

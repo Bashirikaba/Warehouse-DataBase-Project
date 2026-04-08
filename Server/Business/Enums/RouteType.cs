@@ -1,4 +1,4 @@
-namespace Business.Models;
+namespace Business.Enums;
 
 /// <summary>
 /// Перечисление "Приход"/"Расход"

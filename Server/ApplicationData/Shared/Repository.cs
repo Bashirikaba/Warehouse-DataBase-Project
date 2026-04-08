@@ -1,7 +1,7 @@
-using Data.Interfaces;
+using ApplicationData.Infrastructure;
 using NHibernate;
 
-namespace Data.Classes;
+namespace ApplicationData.Shared;
 
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {

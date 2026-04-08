@@ -1,3 +1,5 @@
+using Business.Enums;
+
 namespace Business.Models;
 
 /// <summary>

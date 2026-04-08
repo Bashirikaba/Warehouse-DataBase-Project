@@ -19,13 +19,13 @@ public class GatewayController : ControllerBase
     [HttpPost("{serviceName}/{methodName}")]
     public async Task<IActionResult> Action(string serviceName, string methodName)
     {
-        if (!Registry.TryGetService(serviceName, out var serviceEntry))
+        if (!AutoRouteRegistry.TryGetService(serviceName, out ServiceEntry? serviceEntry))
             return NotFound($"Сервис '{serviceName}' не найден");
 
-        if (!serviceEntry!.Methods.TryGetValue(methodName, out var methodEntry))
+        if (!serviceEntry!.Methods.TryGetValue(methodName, out MethodEntry? methodEntry))
             return NotFound($"Метод '{methodName}' сервиса '{serviceName}' не найден");
 
-        var serviceInstanse = _serviceProvider.GetRequiredService(serviceEntry.Type);
+        object? serviceInstanse = _serviceProvider.GetRequiredService(serviceEntry.Type);
 
         object?[] parameters;
         try
@@ -43,10 +43,9 @@ public class GatewayController : ControllerBase
             result = methodEntry.Method.Invoke(serviceInstanse, parameters);
             if (result is Task task)
             {
-                // TODO че это
-                await task.ConfigureAwait(false);
-                var resultType = result.GetType();
-                // TODO че тут такое происходит узнать
+                await task;
+                Type? resultType = result.GetType();
+
                 if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Task<>))
                 {
                     result = resultType.GetProperty("Result")?.GetValue(result);
@@ -71,17 +70,17 @@ public class GatewayController : ControllerBase
         if (parameters.Length == 0)
             return [];
 
-        using var jsonDoc = await Request.ReadFromJsonAsync<JsonDocument>();
+        using JsonDocument? jsonDoc = await Request.ReadFromJsonAsync<JsonDocument>();
         if (jsonDoc == null)
             throw new ArgumentException("Тело запроса пустое или имеет неправильную структуру JSON");
 
-        var root = jsonDoc.RootElement;
-        var result = new object?[parameters.Length];
+        JsonElement root = jsonDoc.RootElement;
+        object?[] result = new object?[parameters.Length];
 
         for (int i = 0; i < parameters.Length; i++)
         {
-            var param = parameters[i];
-            if (root.TryGetProperty(param.Name!, out var property))
+            ParameterInfo param = parameters[i];
+            if (root.TryGetProperty(param.Name!, out JsonElement property))
             {
                 result[i] = JsonSerializer.Deserialize(property.GetRawText(), param.ParameterType);
             }

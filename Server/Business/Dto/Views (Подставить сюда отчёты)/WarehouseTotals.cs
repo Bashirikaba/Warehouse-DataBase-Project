@@ -1,9 +1,9 @@
-namespace Business.Models;
+namespace Business.Dto;
 
 /// <summary>
 /// Остатки товара на складе
 /// </summary>
-public class WarehouseTotals
+public class WarehouseTotalsDto
 {
     public virtual int Id {get;set;}
     

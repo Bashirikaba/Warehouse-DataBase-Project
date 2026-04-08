@@ -1,9 +1,10 @@
-namespace Business.Models;
+using Business.Enums;
+namespace Business.Dto;
 
 /// <summary>
 /// Детальная информация об извещении
 /// </summary>
-public class InvoiceDetails
+public class InvoiceDetailsDto
 {
     public virtual required int Id { get; set; }
 

@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="API/API.csproj" />
+  <Project Path="ApplicationData/ApplicationData.csproj" />
   <Project Path="Business/Business.csproj" />
-  <Project Path="Data/Data.csproj" />
+  <Project Path="Services/Services.csproj" />
 </Solution>

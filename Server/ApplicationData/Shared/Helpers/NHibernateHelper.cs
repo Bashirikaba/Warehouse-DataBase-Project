@@ -1,16 +1,18 @@
-using Business.Mappings.Tables;
+using System.Reflection;
 using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.Cfg.MappingSchema;
 using NHibernate.Dialect;
 using NHibernate.Driver;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
+using Business.Mappings;
 
-namespace Data.Helpers;
+namespace ApplicationData.Shared.Helpers;
 
-public class NHibernateHelper
+public static class NHibernateHelper
 {
- private static ISessionFactory _sessionFactory;
+    private static ISessionFactory? _sessionFactory;
 
     public static ISessionFactory SessionFactory
     {
@@ -23,7 +25,7 @@ public class NHibernateHelper
 
     private static ISessionFactory CreateSessionFactory()
     {
-        var config = new Configuration();
+        Configuration config = new();
 
         config.DataBaseIntegration(db =>
         {
@@ -34,15 +36,16 @@ public class NHibernateHelper
             db.LogFormattedSql = true;
         });
 
-        var mapper = new ModelMapper();
+        ModelMapper mapper = new();
 
-        mapper.AddMappings(typeof(PositionMap).Assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract &&
+        Assembly mappingsAssembly = Assembly.GetAssembly(typeof(PositionMap))!;
+
+        mapper.AddMappings(mappingsAssembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract &&
                         t.BaseType != null &&
                         t.BaseType.IsGenericType &&
                         t.BaseType.GetGenericTypeDefinition() == typeof(ClassMapping<>)));
 
-        var mapping = mapper.CompileMappingForAllExplicitlyAddedEntities();
+        HbmMapping mapping = mapper.CompileMappingForAllExplicitlyAddedEntities();
         config.AddMapping(mapping);
 
         return config.BuildSessionFactory();

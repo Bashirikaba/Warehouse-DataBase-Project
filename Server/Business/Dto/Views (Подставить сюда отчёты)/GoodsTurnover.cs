@@ -1,9 +1,9 @@
-namespace Business.Models;
+namespace Business.Dto;
 
 /// <summary>
 /// Движение товаров
 /// </summary>
-public class GoodsTurnover
+public class GoodsTurnoverDto
 {
     public virtual int Id {get;set;}
     
