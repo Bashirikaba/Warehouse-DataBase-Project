@@ -1,0 +1,41 @@
+using Business.Enums;
+
+namespace Business.Models;
+
+public class WarehousePeriodReport
+{
+    public virtual required string WarehouseName { get; set; }
+
+    public virtual required RouteType Route { get; set; }
+
+    public virtual int InvoicesCount { get; set; }
+
+    public virtual int UniqueGoods { get; set; }
+
+    public virtual int TotalQuantity { get; set; }
+
+    public virtual decimal TotalSum { get; set; }
+
+    public virtual DateTime FirstDate { get; set; }
+
+    public virtual DateTime LastDate { get; set; }
+
+    public override bool Equals(object obj)
+    {
+        var other = obj as StaffPerformanceReport;
+        if (other == null) return false;
+        return WarehouseName == WarehouseName &&
+                Route == Route &&
+                FirstDate == FirstDate &&
+                LastDate == LastDate;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(WarehouseName,
+                                Route,
+                                FirstDate,
+                                LastDate);
+    }
+}
+

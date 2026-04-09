@@ -30,7 +30,7 @@ public static class NHibernateHelper
         config.DataBaseIntegration(db =>
         {
             db.Driver<NpgsqlDriver>();
-            db.Dialect<PostgreSQLDialect>();
+            db.Dialect<PostgreSQL83Dialect>();
             db.ConnectionString = "Host=localhost:5432;Database=warehouse;Username=postgres;Password=TestConn1";
             db.LogSqlInConsole = true;
             db.LogFormattedSql = true;

@@ -84,66 +84,12 @@ CREATE INDEX idx_invoice_goods ON invoice(goods_id);
 CREATE INDEX idx_invoice_date ON invoice(date);
 */
 
-CREATE VIEW balances_details AS
-SELECT 
-    b.id,
-    w.name AS warehouse_name,
-    g.name AS goods_name,
-    g.code AS goods_code,
-    b.quantity
-FROM balances b
-JOIN warehouses w ON b.warehouse_id = w.id
-JOIN goods g ON b.goods_id = g.id;
-
-CREATE VIEW invoice_details AS
-SELECT 
-    i.id,
-    i.invoice_number,
-    i.date,
-    i.route,
-    w.name AS warehouse_name,
-    g.name AS goods_name,
-    g.code AS goods_code,
-    i.quantity,
-    i.cost,
-    (i.quantity * i.cost) AS total_amount
-FROM invoice i
-JOIN warehouses w ON i.warehouse_id = w.id
-JOIN goods g ON i.goods_id = g.id
-ORDER BY i.date DESC;
-
-CREATE VIEW warehouse_totals AS
-SELECT 
-	w.id,
-    w.name AS warehouse_name,
-    COUNT(b.goods_id) AS unique_goods_count,
-    SUM(b.quantity) AS total_items
-FROM warehouses w
-LEFT JOIN balances b ON w.id = b.warehouse_id
-GROUP BY w.name
-HAVING SUM(b.quantity) > 0 OR COUNT(b.goods_id) > 0;
-
-CREATE VIEW goods_turnover AS
-SELECT 
-    g.id,
-    g.name AS goods_name,
-    g.code,
-    COUNT(i.id) AS documents_count,
-    SUM(CASE WHEN i.route = 'Приход' THEN i.quantity ELSE 0 END) AS total_received,
-    SUM(CASE WHEN i.route = 'Расход' THEN i.quantity ELSE 0 END) AS total_sold,
-    SUM(CASE WHEN i.route = 'Приход' THEN i.cost * i.quantity ELSE 0 END) AS received_sum,
-    SUM(CASE WHEN i.route = 'Расход' THEN i.cost * i.quantity ELSE 0 END) AS sold_sum
-FROM goods g
-LEFT JOIN invoice i ON g.id = i.goods_id
-GROUP BY g.id, g.name, g.code
-HAVING COUNT(i.id) > 0;
-
 -- отчет по складу за период
-CREATE VIEW warehouse_report AS
+CREATE VIEW warehouse_period_report AS
 SELECT 
-    w.name AS warehouse,
+    w.name AS warehouse_name,
     i.route,
-    COUNT(DISTINCT i.id) AS invoices,
+    COUNT(DISTINCT i.id) AS invoices_count,
     COUNT(DISTINCT i.goods_id) AS unique_goods,
     SUM(i.quantity) AS total_quantity,
     SUM(i.cost * i.quantity) AS total_sum,
@@ -154,28 +100,28 @@ JOIN invoice i ON w.id = i.warehouse_id
 GROUP BY w.name, i.route;
 
 -- товары, которые скоро закончатся 
-CREATE VIEW reorder_goods AS
+create VIEW reorder_goods_report AS
 SELECT 
     g.name,
     g.code,
-    b.warehouse_id,
+    w.name as warehouse_name,
     b.quantity,
     COALESCE(SUM(CASE WHEN i.route = 'Расход' THEN i.quantity END), 0) AS sold_last_30_days
 FROM goods g
 JOIN balances b ON g.id = b.goods_id
+join warehouses w on b.warehouse_id = w.id
 LEFT JOIN invoice i ON g.id = i.goods_id 
     AND i.date > CURRENT_DATE - INTERVAL '30 days'
-GROUP BY g.id, g.name, g.code, b.warehouse_id, b.quantity
+GROUP BY g.id, g.name, g.code, w.name, b.quantity
 HAVING b.quantity < 10
 ORDER BY b.quantity;
 
 -- эффективность сотрудников
-CREATE VIEW staff_performance AS
+CREATE VIEW staff_performance_report AS
 SELECT 
-    s.id,
     s.full_name,
     p.name AS position,
-    w.name AS warehouse,
+    w.name AS warehouse_name,
     COUNT(DISTINCT i.id) AS documents_processed,
     COUNT(DISTINCT i.goods_id) AS unique_goods_handled,
     SUM(i.quantity) AS total_items_processed,
@@ -185,7 +131,7 @@ FROM staff s
 JOIN warehouses w ON s.warehouse_id = w.id
 JOIN positions p ON s.position_id = p.id
 LEFT JOIN invoice i ON w.id = i.warehouse_id
-GROUP BY s.id, s.full_name, p.name, w.name
+GROUP BY s.full_name, p.name, w.name
 ORDER BY total_items_processed DESC;
 
 CREATE OR REPLACE FUNCTION update_balances()

@@ -8,7 +8,7 @@ using System.Reflection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-Assembly servicesAssembly = Assembly.GetAssembly(typeof(EntityService))!;
+Assembly servicesAssembly = Assembly.GetAssembly(typeof(PositionsService))!;
 List<Type> servicesTypes = servicesAssembly.GetTypes()
     .Where(t => t.IsClass && !t.IsAbstract && t.GetCustomAttribute<AutoRouteAttribute>() != null)
     .ToList();

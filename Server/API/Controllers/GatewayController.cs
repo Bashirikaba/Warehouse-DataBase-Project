@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/{serviceName}/{methodName}")]
 public class GatewayController : ControllerBase
 {
     private readonly IServiceProvider _serviceProvider;
@@ -16,7 +16,7 @@ public class GatewayController : ControllerBase
         _serviceProvider = serviceProvider;
     }
 
-    [HttpPost("{serviceName}/{methodName}")]
+    [HttpPost]
     public async Task<IActionResult> Action(string serviceName, string methodName)
     {
         if (!AutoRouteRegistry.TryGetService(serviceName, out ServiceEntry? serviceEntry))
@@ -44,16 +44,8 @@ public class GatewayController : ControllerBase
             if (result is Task task)
             {
                 await task;
-                Type? resultType = result.GetType();
-
-                if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    result = resultType.GetProperty("Result")?.GetValue(result);
-                }
-                else
-                {
-                    result = null;
-                }
+                PropertyInfo? resultProperty = result.GetType().GetProperty("Result");
+                result = resultProperty?.GetValue(task);
             }
         }
         catch (TargetInvocationException e)
@@ -64,7 +56,6 @@ public class GatewayController : ControllerBase
         return Ok(result);
     }
 
-    // TODO тоже понять че происходит
     private async Task<object?[]> BindParametersAsync(ParameterInfo[] parameters)
     {
         if (parameters.Length == 0)
