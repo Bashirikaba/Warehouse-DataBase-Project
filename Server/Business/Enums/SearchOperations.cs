@@ -2,7 +2,8 @@ namespace Business.Enums;
 
 public enum SearchOperations
 {
-    More,
-    Less,
-    Equal
+    MoreThan,
+    LessThan,
+    Equal,
+    Like
 }

@@ -1,9 +1,11 @@
+using Business.Infrastructure;
+
 namespace Business.Models;
 
 /// <summary>
 /// Склад
 /// </summary>
-public class Warehouse
+public class Warehouse : IEntity
 {
     public virtual int Id { get; set; }
 

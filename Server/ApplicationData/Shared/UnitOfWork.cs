@@ -1,4 +1,5 @@
 using ApplicationData.Infrastructure;
+using Business.Infrastructure;
 using NHibernate;
 
 namespace ApplicationData.Shared;
@@ -22,7 +23,7 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    public IRepository<T> GetRepository<T>() where T : class
+    public IRepository<T> GetRepository<T>() where T : IEntity
     {
         if (!_repositories.ContainsKey(typeof(T)))
             _repositories[typeof(T)] = new Repository<T>(_session);

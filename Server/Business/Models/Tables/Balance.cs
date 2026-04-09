@@ -1,9 +1,11 @@
+using Business.Infrastructure;
+
 namespace Business.Models;
 
 /// <summary>
 /// Остатки товара на складе
 /// </summary>
-public class Balance
+public class Balance : IEntity
 {
     public virtual int Id { get; set; }
 

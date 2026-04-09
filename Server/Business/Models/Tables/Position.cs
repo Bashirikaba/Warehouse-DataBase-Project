@@ -1,9 +1,11 @@
+using Business.Infrastructure;
+
 namespace Business.Models;
 
 /// <summary>
 /// Должность
 /// </summary>
-public class Position
+public class Position : IEntity
 {
     public virtual int Id { get; set; }
 

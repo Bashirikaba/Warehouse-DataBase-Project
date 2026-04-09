@@ -1,10 +1,10 @@
 using ApplicationData.Infrastructure;
+using Business.Infrastructure;
 using NHibernate;
-using NHibernate.Dialect.Function;
 
 namespace ApplicationData.Shared;
 
-public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+public class Repository<T> : IRepository<T> where T : IEntity
 {
     protected readonly ISession _session;
 
@@ -13,30 +13,30 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         _session = session;
     }
 
-    public IQueryable<TEntity> Query()
+    public IQueryable<T> Query()
     {
-        return _session.Query<TEntity>();
+        return _session.Query<T>();
     }
 
-    public async Task<TEntity> GetByIdAsync(int id)
+    public async Task<T> GetByIdAsync(int id)
     {
-        return await _session.GetAsync<TEntity>(id);
+        return await _session.GetAsync<T>(id);
     }
 
 
-    public async Task<object?> InsertAsync(TEntity entity)
+    public async Task<object?> InsertAsync(T entity)
     {
         return await _session.SaveAsync(entity);
     }
 
-    public async Task UpdateAsync(TEntity entity)
+    public async Task UpdateAsync(T entity)
     {
         await _session.UpdateAsync(entity);
     }
 
     public async Task DeleteByIdAsync(int id)
     {
-        TEntity entity = await GetByIdAsync(id);
+        T entity = await GetByIdAsync(id);
         if (entity != null)
         {
             await _session.DeleteAsync(entity);

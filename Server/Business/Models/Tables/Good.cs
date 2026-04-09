@@ -1,9 +1,11 @@
+using Business.Infrastructure;
+
 namespace Business.Models;
 
 /// <summary>
 /// Информация о товаре
 /// </summary>
-public class Good
+public class Good : IEntity
 {
     public virtual int Id { get; set; }
     

@@ -1,11 +1,12 @@
 using Business.Enums;
+using Business.Infrastructure;
 
 namespace Business.Models;
 
 /// <summary>
 /// Извещение о приходе/расходе
 /// </summary>
-public class Invoice
+public class Invoice : IEntity
 {
     public virtual int Id { get; set; }
 

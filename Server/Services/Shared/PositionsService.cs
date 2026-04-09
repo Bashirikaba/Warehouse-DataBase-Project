@@ -1,7 +1,14 @@
 using ApplicationData.Infrastructure;
 using Business.Attributes;
 using Business.Dto;
+using Business.Dto.Search;
+using Business.Dto.Search.Params;
+using Business.Enums;
 using Business.Models;
+using NHibernate.Criterion;
+using NHibernate.Linq;
+using NHibernate.Util;
+using Npgsql.Internal.Postgres;
 using Services.Infrastructure;
 
 namespace Services.Shared;
@@ -38,18 +45,44 @@ public record class PositionsService : IEntityService<PositionDto>
         await _unitOfWork.CommitAsync();
     }
 
-    public Task<IList<PositionDto>> Get(IList<StringParamDto>? stringParams, IList<NumberParamDto>? numberParams, IList<DateParamDto>? dateParams)
+    public async Task<IReadOnlyList<PositionDto>> Get(SearchDataDto? dto)
     {
-        throw new NotImplementedException();
+        IQueryable<Position> query = _positionRepository.Query();
+
+        if (dto != null && dto.StringParams != null)
+        {
+            foreach (StringParam param in dto.StringParams)
+            {
+                if (param.Field == "Name")
+                {
+                    switch (param.Operation)
+                    {
+                        case SearchOperations.Equal:
+                            query = query.Where(p => p.Name == param.Value);
+                            break;
+
+                        case SearchOperations.Like:
+                            query = query.Where(p => p.Name.Contains(param.Value));
+                            break;
+                    }
+                }
+            }
+        }
+
+        return await query.Select(p => new PositionDto { Id = p.Id, Name = p.Name }).ToListAsync();
     }
 
     public async Task<PositionDto> Update(PositionDto dto)
     {
-        _unitOfWork.BeginTransaction();
+        if (dto.Id is not null)
+        {
+            Position position = new() { Id = Convert.ToInt32(dto.Id), Name = dto.Name };
+            _unitOfWork.BeginTransaction();
 
-        
+            await _positionRepository.UpdateAsync(position);
+            await _unitOfWork.CommitAsync();
+        }
 
-        await _unitOfWork.CommitAsync();
-        throw new NotImplementedException();
+        return dto;
     }
 }

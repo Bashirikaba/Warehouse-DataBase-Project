@@ -1,6 +1,8 @@
+using Business.Infrastructure;
+
 namespace ApplicationData.Infrastructure;
 
-public interface IRepository<TEntity> where TEntity : class
+public interface IRepository<TEntity> where TEntity : IEntity
 {
     IQueryable<TEntity> Query();
 

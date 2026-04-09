@@ -1,4 +1,5 @@
 using Business.Dto;
+using Business.Dto.Search;
 
 namespace Services.Infrastructure;
 
@@ -6,7 +7,7 @@ public interface IEntityService<TDto>
 {
     Task<int?> Add(TDto dto);
 
-    Task<IList<TDto>> Get(IList<StringParamDto>? stringParams, IList<NumberParamDto>? numberParams, IList<DateParamDto>? dateParams);
+    Task<IReadOnlyList<TDto>> Get(SearchDataDto? dto);
 
     Task<TDto> Update(TDto dto);
 

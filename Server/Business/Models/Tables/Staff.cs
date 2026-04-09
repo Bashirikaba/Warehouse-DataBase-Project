@@ -1,9 +1,11 @@
+using Business.Infrastructure;
+
 namespace Business.Models;
 
 /// <summary>
 /// Персонал
 /// </summary>
-public class Staff
+public class Staff : IEntity
 {
     public virtual int Id { get; set; }
 
