@@ -7,9 +7,9 @@ public class StaffDto
 {
     public int? Id { get; set; }
 
-    public int WarehouseId { get; set; }
+    public required string WarehouseName { get; set; }
 
-    public int PositionId { get; set; }
+    public required string PositionName { get; set; }
 
     public required string FullName { get; set; }
 

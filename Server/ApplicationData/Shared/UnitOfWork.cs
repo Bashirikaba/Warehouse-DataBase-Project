@@ -30,6 +30,13 @@ public class UnitOfWork : IUnitOfWork
         return (IRepository<T>)_repositories[typeof(T)];
     }
 
+    public IReadOnlyRepository<T> GetReadOnlyRepository<T>() where T : IReport
+    {
+        if (!_repositories.ContainsKey(typeof(T)))
+            _repositories[typeof(T)] = new ReadOnlyRepository<T>(_session);
+        return (IReadOnlyRepository<T>)_repositories[typeof(T)];
+    }
+
     public async Task CommitAsync()
     {
         if (_transaction != null && _transaction.IsActive)

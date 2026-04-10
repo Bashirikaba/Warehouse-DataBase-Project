@@ -1,20 +1,16 @@
 using ApplicationData.Infrastructure;
+using ApplicationData.Shared.Helpers;
 using Business.Attributes;
 using Business.Dto;
 using Business.Dto.Search;
-using Business.Dto.Search.Params;
-using Business.Enums;
 using Business.Models;
-using NHibernate.Criterion;
 using NHibernate.Linq;
-using NHibernate.Util;
-using Npgsql.Internal.Postgres;
 using Services.Infrastructure;
 
 namespace Services.Shared;
 
 [AutoRoute]
-public record class PositionsService : IEntityService<PositionDto>
+public class PositionsService : IEntityService<PositionDto>
 {
     private IUnitOfWork _unitOfWork;
 
@@ -30,7 +26,7 @@ public record class PositionsService : IEntityService<PositionDto>
     {
         _unitOfWork.BeginTransaction();
 
-        Position? position = new() { Name = dto.Name };
+        Position position = new() { Name = dto.Name };
 
         object? id = await _positionRepository.InsertAsync(position);
         await _unitOfWork.CommitAsync();
@@ -51,22 +47,7 @@ public record class PositionsService : IEntityService<PositionDto>
 
         if (dto != null && dto.StringParams != null)
         {
-            foreach (StringParam param in dto.StringParams)
-            {
-                if (param.Field == "Name")
-                {
-                    switch (param.Operation)
-                    {
-                        case SearchOperations.Equal:
-                            query = query.Where(p => p.Name == param.Value);
-                            break;
-
-                        case SearchOperations.Like:
-                            query = query.Where(p => p.Name.Contains(param.Value));
-                            break;
-                    }
-                }
-            }
+            query = query.ApplyStringFilters(dto.StringParams);
         }
 
         return await query.Select(p => new PositionDto { Id = p.Id, Name = p.Name }).ToListAsync();

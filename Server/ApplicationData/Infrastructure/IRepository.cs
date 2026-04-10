@@ -2,15 +2,15 @@ using Business.Infrastructure;
 
 namespace ApplicationData.Infrastructure;
 
-public interface IRepository<TEntity> where TEntity : IEntity
+public interface IRepository<T> where T : IEntity
 {
-    IQueryable<TEntity> Query();
+    IQueryable<T> Query();
 
-    Task<TEntity> GetByIdAsync(int id);
+    T? GetByFieldAsync(string fieldName, string? value);
 
-    Task<object?> InsertAsync(TEntity entity);
+    Task<object?> InsertAsync(T entity);
 
-    Task UpdateAsync(TEntity entity);
+    Task UpdateAsync(T entity);
 
     Task DeleteByIdAsync(int id);
 }

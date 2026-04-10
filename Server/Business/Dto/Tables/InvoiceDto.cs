@@ -9,9 +9,9 @@ public class InvoiceDto
 {
     public int? Id { get; set; }
 
-    public int WarehouseId { get; set; }
+    public required string WarehouseName { get; set; }
 
-    public int GoodId { get; set; }
+    public required string GoodNomenclatureNumber { get; set; }
 
     public required string InvoiceNumber { get; set; }
 

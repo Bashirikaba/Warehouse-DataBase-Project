@@ -1,6 +1,8 @@
+using Business.Infrastructure;
+
 namespace Business.Models;
 
-public class ReorderGoodsReport
+public class ReorderGoodsReport : IReport
 {
     public virtual required string Name { get; set; }
     

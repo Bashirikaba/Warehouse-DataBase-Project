@@ -1,6 +1,8 @@
+using Business.Infrastructure;
+
 namespace Business.Models;
 
-public class StaffPerformanceReport
+public class StaffPerformanceReport : IReport
 {
     public virtual required string FullName { get; set; }
 

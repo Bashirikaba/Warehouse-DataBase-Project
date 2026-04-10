@@ -1,8 +1,9 @@
 using Business.Enums;
+using Business.Infrastructure;
 
 namespace Business.Models;
 
-public class WarehousePeriodReport
+public class WarehousePeriodReport : IReport
 {
     public virtual required string WarehouseName { get; set; }
 

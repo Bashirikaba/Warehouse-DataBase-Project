@@ -1,6 +1,7 @@
 using ApplicationData.Infrastructure;
 using Business.Infrastructure;
 using NHibernate;
+using System.Linq.Dynamic.Core;
 
 namespace ApplicationData.Shared;
 
@@ -13,16 +14,16 @@ public class Repository<T> : IRepository<T> where T : IEntity
         _session = session;
     }
 
+    public T? GetByFieldAsync(string fieldName, string value)
+    {
+        return Query().Where($"{fieldName} == @0", value).FirstOrDefault();
+        
+    }
+
     public IQueryable<T> Query()
     {
         return _session.Query<T>();
     }
-
-    public async Task<T> GetByIdAsync(int id)
-    {
-        return await _session.GetAsync<T>(id);
-    }
-
 
     public async Task<object?> InsertAsync(T entity)
     {
@@ -36,7 +37,7 @@ public class Repository<T> : IRepository<T> where T : IEntity
 
     public async Task DeleteByIdAsync(int id)
     {
-        T entity = await GetByIdAsync(id);
+        T entity = await _session.GetAsync<T>(id);
         if (entity != null)
         {
             await _session.DeleteAsync(entity);

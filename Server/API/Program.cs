@@ -30,6 +30,7 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton(NHibernateHelper.SessionFactory);
 builder.Services.AddScoped(sp => NHibernateHelper.OpenSession());
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped(typeof(IReadOnlyRepository<>), typeof(ReadOnlyRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 WebApplication app = builder.Build();
