@@ -12,6 +12,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Button: typeof import('primevue/button')['default']
+    Card: typeof import('primevue/card')['default']
+    Column: typeof import('primevue/column')['default']
+    DataTable: typeof import('primevue/datatable')['default']
+    Fieldset: typeof import('primevue/fieldset')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
@@ -27,6 +32,11 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const Button: typeof import('primevue/button')['default']
+  const Card: typeof import('primevue/card')['default']
+  const Column: typeof import('primevue/column')['default']
+  const DataTable: typeof import('primevue/datatable')['default']
+  const Fieldset: typeof import('primevue/fieldset')['default']
   const HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
   const IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
   const IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
