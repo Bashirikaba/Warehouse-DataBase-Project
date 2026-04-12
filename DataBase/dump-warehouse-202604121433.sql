@@ -1,0 +1,936 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict fMWxxzfW12LezlzlPMVgKE3VZjJcDLTyG0oksZitIFczaJQ00l2BxyAVtZTQy4P
+
+-- Dumped from database version 18.1
+-- Dumped by pg_dump version 18.1
+
+-- Started on 2026-04-12 14:33:45
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 5090 (class 1262 OID 73903)
+-- Name: warehouse; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE warehouse WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Russian_Russia.1251';
+
+
+ALTER DATABASE warehouse OWNER TO postgres;
+
+\unrestrict fMWxxzfW12LezlzlPMVgKE3VZjJcDLTyG0oksZitIFczaJQ00l2BxyAVtZTQy4P
+\connect warehouse
+\restrict fMWxxzfW12LezlzlPMVgKE3VZjJcDLTyG0oksZitIFczaJQ00l2BxyAVtZTQy4P
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 873 (class 1247 OID 73974)
+-- Name: route_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.route_type AS ENUM (
+    'Приход',
+    'Расход'
+);
+
+
+ALTER TYPE public.route_type OWNER TO postgres;
+
+--
+-- TOC entry 240 (class 1255 OID 74098)
+-- Name: create_balance(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.create_balance() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    INSERT INTO balances (warehouse_id, goods_id, quantity)
+    VALUES (NEW.warehouse_id, NEW.goods_id, 0)
+    ON CONFLICT (warehouse_id, goods_id) DO NOTHING;
+    
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.create_balance() OWNER TO postgres;
+
+--
+-- TOC entry 239 (class 1255 OID 74096)
+-- Name: update_balances(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.update_balances() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF NEW.route = 'Приход' THEN
+        INSERT INTO balances (warehouse_id, goods_id, quantity)
+        VALUES (NEW.warehouse_id, NEW.goods_id, NEW.quantity)
+        ON CONFLICT (warehouse_id, goods_id) 
+        DO UPDATE SET quantity = balances.quantity + NEW.quantity;
+    
+    ELSE
+        IF NOT EXISTS (
+            SELECT 1 FROM balances 
+            WHERE warehouse_id = NEW.warehouse_id 
+            AND goods_id = NEW.goods_id 
+            AND quantity >= NEW.quantity
+        ) THEN
+            RAISE EXCEPTION 'Не хватает товара на складе';
+        END IF;
+        
+        UPDATE balances 
+        SET quantity = quantity - NEW.quantity
+        WHERE warehouse_id = NEW.warehouse_id AND goods_id = NEW.goods_id;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.update_balances() OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 228 (class 1259 OID 74044)
+-- Name: balances; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.balances (
+    id integer NOT NULL,
+    warehouse_id integer NOT NULL,
+    goods_id integer NOT NULL,
+    quantity integer DEFAULT 0 NOT NULL,
+    CONSTRAINT balances_quantity_check CHECK ((quantity >= 0))
+);
+
+
+ALTER TABLE public.balances OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 74031)
+-- Name: goods; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.goods (
+    id integer NOT NULL,
+    code character varying(15) NOT NULL,
+    nomenclature_number character varying(5) NOT NULL,
+    name character varying(200) NOT NULL,
+    price numeric(9,2) NOT NULL
+);
+
+
+ALTER TABLE public.goods OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 74010)
+-- Name: warehouses; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.warehouses (
+    id integer NOT NULL,
+    manager_id integer,
+    name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.warehouses OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 74104)
+-- Name: balances_details; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.balances_details AS
+ SELECT b.id,
+    w.name AS warehouse_name,
+    g.name AS goods_name,
+    g.code AS goods_code,
+    b.quantity
+   FROM ((public.balances b
+     JOIN public.warehouses w ON ((b.warehouse_id = w.id)))
+     JOIN public.goods g ON ((b.goods_id = g.id)));
+
+
+ALTER VIEW public.balances_details OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 74043)
+-- Name: balances_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.balances ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.balances_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 225 (class 1259 OID 74030)
+-- Name: goods_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.goods ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.goods_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 230 (class 1259 OID 74068)
+-- Name: invoice; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.invoice (
+    id integer NOT NULL,
+    warehouse_id integer NOT NULL,
+    goods_id integer NOT NULL,
+    invoice_number character varying(5) NOT NULL,
+    date date DEFAULT CURRENT_DATE NOT NULL,
+    route public.route_type NOT NULL,
+    quantity integer NOT NULL,
+    cost numeric(11,2) NOT NULL,
+    CONSTRAINT invoice_cost_check CHECK ((cost >= (0)::numeric)),
+    CONSTRAINT invoice_quantity_check CHECK ((quantity > 0))
+);
+
+
+ALTER TABLE public.invoice OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 74117)
+-- Name: goods_turnover; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.goods_turnover AS
+ SELECT g.id,
+    g.name AS goods_name,
+    g.code,
+    count(i.id) AS documents_count,
+    sum(
+        CASE
+            WHEN (i.route = 'Приход'::public.route_type) THEN i.quantity
+            ELSE 0
+        END) AS total_received,
+    sum(
+        CASE
+            WHEN (i.route = 'Расход'::public.route_type) THEN i.quantity
+            ELSE 0
+        END) AS total_sold,
+    sum(
+        CASE
+            WHEN (i.route = 'Приход'::public.route_type) THEN (i.cost * (i.quantity)::numeric)
+            ELSE (0)::numeric
+        END) AS received_sum,
+    sum(
+        CASE
+            WHEN (i.route = 'Расход'::public.route_type) THEN (i.cost * (i.quantity)::numeric)
+            ELSE (0)::numeric
+        END) AS sold_sum
+   FROM (public.goods g
+     LEFT JOIN public.invoice i ON ((g.id = i.goods_id)))
+  GROUP BY g.id, g.name, g.code
+ HAVING (count(i.id) > 0);
+
+
+ALTER VIEW public.goods_turnover OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 74108)
+-- Name: invoice_details; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.invoice_details AS
+ SELECT i.id,
+    i.invoice_number,
+    i.date,
+    i.route,
+    w.name AS warehouse_name,
+    g.name AS goods_name,
+    g.code AS goods_code,
+    i.quantity,
+    i.cost,
+    ((i.quantity)::numeric * i.cost) AS total_amount
+   FROM ((public.invoice i
+     JOIN public.warehouses w ON ((i.warehouse_id = w.id)))
+     JOIN public.goods g ON ((i.goods_id = g.id)))
+  ORDER BY i.date DESC;
+
+
+ALTER VIEW public.invoice_details OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 74067)
+-- Name: invoice_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.invoice ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.invoice_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 220 (class 1259 OID 73980)
+-- Name: positions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.positions (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.positions OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 73979)
+-- Name: positions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.positions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.positions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 236 (class 1259 OID 106673)
+-- Name: reorder_goods_report; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.reorder_goods_report AS
+ SELECT g.name,
+    g.code,
+    w.name AS warehouse_name,
+    b.quantity,
+    COALESCE(sum(
+        CASE
+            WHEN (i.route = 'Расход'::public.route_type) THEN i.quantity
+            ELSE NULL::integer
+        END), (0)::bigint) AS sold_last_30_days
+   FROM (((public.goods g
+     JOIN public.balances b ON ((g.id = b.goods_id)))
+     JOIN public.warehouses w ON ((b.warehouse_id = w.id)))
+     LEFT JOIN public.invoice i ON (((g.id = i.goods_id) AND (i.date > (CURRENT_DATE - '30 days'::interval)))))
+  GROUP BY g.id, g.name, g.code, w.name, b.quantity
+ HAVING (b.quantity < 10)
+  ORDER BY b.quantity;
+
+
+ALTER VIEW public.reorder_goods_report OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 73990)
+-- Name: staff; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.staff (
+    id integer NOT NULL,
+    warehouse_id integer NOT NULL,
+    position_id integer NOT NULL,
+    full_name character varying(50) NOT NULL,
+    tin character varying(12) NOT NULL
+);
+
+
+ALTER TABLE public.staff OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 73989)
+-- Name: staff_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.staff ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.staff_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 231 (class 1259 OID 74100)
+-- Name: staff_info; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.staff_info AS
+ SELECT id,
+    full_name,
+    tin,
+    warehouse_id
+   FROM public.staff
+  ORDER BY full_name;
+
+
+ALTER VIEW public.staff_info OWNER TO postgres;
+
+--
+-- TOC entry 237 (class 1259 OID 106678)
+-- Name: staff_performance_report; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.staff_performance_report AS
+ SELECT s.full_name,
+    p.name AS "position",
+    w.name AS warehouse_name,
+    count(DISTINCT i.id) AS documents_processed,
+    count(DISTINCT i.goods_id) AS unique_goods_handled,
+    sum(i.quantity) AS total_items_processed,
+    sum((i.cost * (i.quantity)::numeric)) AS total_value_processed,
+    max(i.date) AS last_work_date
+   FROM (((public.staff s
+     JOIN public.warehouses w ON ((s.warehouse_id = w.id)))
+     JOIN public.positions p ON ((s.position_id = p.id)))
+     LEFT JOIN public.invoice i ON ((w.id = i.warehouse_id)))
+  GROUP BY s.full_name, p.name, w.name
+  ORDER BY (sum(i.quantity)) DESC;
+
+
+ALTER VIEW public.staff_performance_report OWNER TO postgres;
+
+--
+-- TOC entry 238 (class 1259 OID 106683)
+-- Name: warehouse_period_report; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.warehouse_period_report AS
+ SELECT w.name AS warehouse_name,
+    i.route,
+    count(DISTINCT i.id) AS invoices_count,
+    count(DISTINCT i.goods_id) AS unique_goods,
+    sum(i.quantity) AS total_quantity,
+    sum((i.cost * (i.quantity)::numeric)) AS total_sum,
+    min(i.date) AS first_date,
+    max(i.date) AS last_date
+   FROM (public.warehouses w
+     JOIN public.invoice i ON ((w.id = i.warehouse_id)))
+  GROUP BY w.name, i.route;
+
+
+ALTER VIEW public.warehouse_period_report OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 74113)
+-- Name: warehouse_totals; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.warehouse_totals AS
+ SELECT w.name AS warehouse_name,
+    count(b.goods_id) AS unique_goods_count,
+    sum(b.quantity) AS total_items
+   FROM (public.warehouses w
+     LEFT JOIN public.balances b ON ((w.id = b.warehouse_id)))
+  GROUP BY w.name
+ HAVING ((sum(b.quantity) > 0) OR (count(b.goods_id) > 0));
+
+
+ALTER VIEW public.warehouse_totals OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 74009)
+-- Name: warehouses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.warehouses ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.warehouses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 5082 (class 0 OID 74044)
+-- Dependencies: 228
+-- Data for Name: balances; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.balances (id, warehouse_id, goods_id, quantity) FROM stdin;
+4	147	4	120
+5	147	5	75
+7	148	7	30
+9	148	9	18
+10	148	10	12
+12	149	12	8
+13	149	13	15
+14	149	14	6
+15	149	15	30
+18	149	18	25
+19	149	19	80
+20	149	20	45
+17	149	17	700
+1	147	1	300
+2	147	2	210
+3	147	3	110
+6	148	6	55
+8	148	8	640
+11	149	11	44
+16	149	16	150
+\.
+
+
+--
+-- TOC entry 5080 (class 0 OID 74031)
+-- Dependencies: 226
+-- Data for Name: goods; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.goods (id, code, nomenclature_number, name, price) FROM stdin;
+1	ПР-001	00101	Пшеничная мука высший сорт	45.50
+2	ПР-002	00102	Сахар песок	62.00
+3	ПР-003	00103	Масло подсолнечное рафинированное	120.00
+4	ПР-004	00104	Рис шлифованный	95.00
+5	ПР-005	00105	Гречневая крупа ядрица	88.00
+6	МТ-001	00201	Доска обрезная 50x150x6000	1250.00
+7	МТ-002	00202	Фанера ФК 1525x1525x10	980.00
+8	МТ-003	00203	Гвозди строительные 100мм	85.00
+9	МТ-004	00204	Краска акриловая белая 2.7л	450.00
+10	МТ-005	00205	Шпатлёвка финишная 20кг	390.00
+11	ЗЧ-001	00301	Фильтр масляный для автомобиля	350.00
+12	ЗЧ-002	00302	Тормозные колодки передние	1250.00
+13	ЗЧ-003	00303	Свеча зажигания (4 шт)	600.00
+14	ЗЧ-004	00304	Ремень ГРМ	850.00
+15	ЗЧ-005	00305	Лампа галогенная H4	320.00
+16	КН-001	00401	Бумага офисная А4 80г/м2	320.00
+17	КН-002	00402	Ручка шариковая синяя	12.50
+18	КН-003	00403	Степлер офисный №10	85.00
+19	КН-004	00404	Папка-скоросшиватель пластик	35.00
+20	КН-005	00405	Маркер перманентный черный	28.00
+\.
+
+
+--
+-- TOC entry 5084 (class 0 OID 74068)
+-- Dependencies: 230
+-- Data for Name: invoice; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.invoice (id, warehouse_id, goods_id, invoice_number, date, route, quantity, cost) FROM stdin;
+1	147	1	INV01	2026-03-01	Приход	100	43.00
+2	147	2	INV02	2026-03-02	Приход	80	59.50
+3	147	3	INV03	2026-03-05	Приход	50	118.00
+4	148	6	INV04	2026-03-10	Приход	20	1220.00
+5	148	8	INV05	2026-03-12	Приход	200	82.00
+6	149	11	INV06	2026-03-15	Приход	30	340.00
+7	149	16	INV07	2026-03-18	Приход	60	310.00
+8	149	17	INV08	2026-03-20	Приход	200	11.00
+9	147	1	INV09	2026-03-22	Расход	50	44.00
+10	147	2	INV10	2026-03-23	Расход	50	61.00
+11	147	3	INV11	2026-03-24	Расход	30	119.00
+12	148	6	INV12	2026-03-25	Расход	10	1240.00
+13	148	8	INV13	2026-03-26	Расход	60	83.00
+14	149	11	INV14	2026-03-27	Расход	10	345.00
+15	149	16	INV15	2026-03-28	Расход	20	315.00
+\.
+
+
+--
+-- TOC entry 5074 (class 0 OID 73980)
+-- Dependencies: 220
+-- Data for Name: positions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.positions (id, name) FROM stdin;
+25	Менеджер
+26	Кладовщик
+27	Бухгалтер
+28	Директор склада
+\.
+
+
+--
+-- TOC entry 5076 (class 0 OID 73990)
+-- Dependencies: 222
+-- Data for Name: staff; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.staff (id, warehouse_id, position_id, full_name, tin) FROM stdin;
+59	147	28	Петров Иван Алексеевич	123456789012
+60	147	25	Сидорова Мария Петровна	234567890123
+61	147	26	Кузнецов Дмитрий Сергеевич	345678901234
+62	148	25	Васильева Анна Владимировна	456789012345
+63	148	26	Николаев Павел Андреевич	567890123456
+64	149	28	Михайлов Сергей Викторович	678901234567
+65	149	26	Егорова Ольга Ивановна	789012345678
+\.
+
+
+--
+-- TOC entry 5078 (class 0 OID 74010)
+-- Dependencies: 224
+-- Data for Name: warehouses; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.warehouses (id, manager_id, name) FROM stdin;
+147	60	Склад готовой продукции
+148	62	Склад сырья и материалов
+149	64	Склад запасных частей
+\.
+
+
+--
+-- TOC entry 5091 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: balances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.balances_id_seq', 43, true);
+
+
+--
+-- TOC entry 5092 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: goods_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.goods_id_seq', 20, true);
+
+
+--
+-- TOC entry 5093 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: invoice_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.invoice_id_seq', 15, true);
+
+
+--
+-- TOC entry 5094 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: positions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.positions_id_seq', 28, true);
+
+
+--
+-- TOC entry 5095 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: staff_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.staff_id_seq', 65, true);
+
+
+--
+-- TOC entry 5096 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: warehouses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.warehouses_id_seq', 149, true);
+
+
+--
+-- TOC entry 4897 (class 2606 OID 74054)
+-- Name: balances balances_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.balances
+    ADD CONSTRAINT balances_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4891 (class 2606 OID 74042)
+-- Name: goods goods_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.goods
+    ADD CONSTRAINT goods_code_key UNIQUE (code);
+
+
+--
+-- TOC entry 4893 (class 2606 OID 98481)
+-- Name: goods goods_nomenclature_number_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.goods
+    ADD CONSTRAINT goods_nomenclature_number_name_key UNIQUE (nomenclature_number, name);
+
+
+--
+-- TOC entry 4895 (class 2606 OID 74040)
+-- Name: goods goods_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.goods
+    ADD CONSTRAINT goods_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4906 (class 2606 OID 74085)
+-- Name: invoice invoice_invoice_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.invoice
+    ADD CONSTRAINT invoice_invoice_number_key UNIQUE (invoice_number);
+
+
+--
+-- TOC entry 4908 (class 2606 OID 74083)
+-- Name: invoice invoice_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.invoice
+    ADD CONSTRAINT invoice_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4877 (class 2606 OID 73988)
+-- Name: positions positions_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.positions
+    ADD CONSTRAINT positions_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 4879 (class 2606 OID 73986)
+-- Name: positions positions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.positions
+    ADD CONSTRAINT positions_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4883 (class 2606 OID 73999)
+-- Name: staff staff_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.staff
+    ADD CONSTRAINT staff_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4885 (class 2606 OID 74001)
+-- Name: staff staff_tin_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.staff
+    ADD CONSTRAINT staff_tin_key UNIQUE (tin);
+
+
+--
+-- TOC entry 4901 (class 2606 OID 74056)
+-- Name: balances unique_warehouse_goods; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.balances
+    ADD CONSTRAINT unique_warehouse_goods UNIQUE (warehouse_id, goods_id);
+
+
+--
+-- TOC entry 4887 (class 2606 OID 74019)
+-- Name: warehouses warehouses_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.warehouses
+    ADD CONSTRAINT warehouses_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 4889 (class 2606 OID 74017)
+-- Name: warehouses warehouses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.warehouses
+    ADD CONSTRAINT warehouses_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4898 (class 1259 OID 114866)
+-- Name: idx_balances_goods; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_balances_goods ON public.balances USING btree (goods_id);
+
+
+--
+-- TOC entry 4899 (class 1259 OID 114865)
+-- Name: idx_balances_warehouse; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_balances_warehouse ON public.balances USING btree (warehouse_id);
+
+
+--
+-- TOC entry 4902 (class 1259 OID 114869)
+-- Name: idx_invoice_date; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_invoice_date ON public.invoice USING btree (date);
+
+
+--
+-- TOC entry 4903 (class 1259 OID 114868)
+-- Name: idx_invoice_goods; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_invoice_goods ON public.invoice USING btree (goods_id);
+
+
+--
+-- TOC entry 4904 (class 1259 OID 114867)
+-- Name: idx_invoice_warehouse; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_invoice_warehouse ON public.invoice USING btree (warehouse_id);
+
+
+--
+-- TOC entry 4880 (class 1259 OID 114864)
+-- Name: idx_staff_position; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_staff_position ON public.staff USING btree (position_id);
+
+
+--
+-- TOC entry 4881 (class 1259 OID 114863)
+-- Name: idx_staff_warehouse; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_staff_warehouse ON public.staff USING btree (warehouse_id);
+
+
+--
+-- TOC entry 4916 (class 2620 OID 74099)
+-- Name: invoice trg_ensure_balance; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER trg_ensure_balance BEFORE INSERT ON public.invoice FOR EACH ROW EXECUTE FUNCTION public.create_balance();
+
+
+--
+-- TOC entry 4917 (class 2620 OID 74097)
+-- Name: invoice trg_invoice_balances; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER trg_invoice_balances AFTER INSERT ON public.invoice FOR EACH ROW EXECUTE FUNCTION public.update_balances();
+
+
+--
+-- TOC entry 4912 (class 2606 OID 74062)
+-- Name: balances fk_balances_goods; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.balances
+    ADD CONSTRAINT fk_balances_goods FOREIGN KEY (goods_id) REFERENCES public.goods(id) ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 4913 (class 2606 OID 74057)
+-- Name: balances fk_balances_warehouse; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.balances
+    ADD CONSTRAINT fk_balances_warehouse FOREIGN KEY (warehouse_id) REFERENCES public.warehouses(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4914 (class 2606 OID 74091)
+-- Name: invoice fk_invoice_goods; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.invoice
+    ADD CONSTRAINT fk_invoice_goods FOREIGN KEY (goods_id) REFERENCES public.goods(id) ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 4915 (class 2606 OID 74086)
+-- Name: invoice fk_invoice_warehouse; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.invoice
+    ADD CONSTRAINT fk_invoice_warehouse FOREIGN KEY (warehouse_id) REFERENCES public.warehouses(id) ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 4909 (class 2606 OID 74025)
+-- Name: staff fk_staff_warehouse; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.staff
+    ADD CONSTRAINT fk_staff_warehouse FOREIGN KEY (warehouse_id) REFERENCES public.warehouses(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4911 (class 2606 OID 82095)
+-- Name: warehouses fk_warehouses_manager; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.warehouses
+    ADD CONSTRAINT fk_warehouses_manager FOREIGN KEY (manager_id) REFERENCES public.staff(id) ON UPDATE SET NULL ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 4910 (class 2606 OID 74004)
+-- Name: staff staff_position_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.staff
+    ADD CONSTRAINT staff_position_id_fkey FOREIGN KEY (position_id) REFERENCES public.positions(id) ON DELETE RESTRICT;
+
+
+-- Completed on 2026-04-12 14:33:45
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict fMWxxzfW12LezlzlPMVgKE3VZjJcDLTyG0oksZitIFczaJQ00l2BxyAVtZTQy4P
+
