@@ -22,5 +22,4 @@ public class InvoiceDto
     public int Quantity { get; set; }
 
     public decimal Cost { get; set; }
-
 }
