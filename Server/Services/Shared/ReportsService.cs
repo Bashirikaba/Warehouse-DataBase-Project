@@ -1,5 +1,6 @@
 using ApplicationData.Infrastructure;
 using ApplicationData.Shared.Helpers;
+using Business.Attributes;
 using Business.Dto.Search;
 using Business.Models;
 using NHibernate.Linq;
@@ -7,6 +8,7 @@ using Services.Infrastructure;
 
 namespace Services.Shared;
 
+[AutoRoute]
 public class ReportsService : IReportService
 {
     private IUnitOfWork _unitOfWork;

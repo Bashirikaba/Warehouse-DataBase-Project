@@ -23,12 +23,12 @@ public class WarehousePeriodReport : IReport
 
     public override bool Equals(object obj)
     {
-        var other = obj as StaffPerformanceReport;
+        var other = obj as WarehousePeriodReport;
         if (other == null) return false;
-        return WarehouseName == WarehouseName &&
-                Route == Route &&
-                FirstDate == FirstDate &&
-                LastDate == LastDate;
+        return WarehouseName == other.WarehouseName &&
+                Route == other.Route &&
+                FirstDate == other.FirstDate &&
+                LastDate == other.LastDate;
     }
 
     public override int GetHashCode()
