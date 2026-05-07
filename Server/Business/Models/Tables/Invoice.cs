@@ -18,7 +18,7 @@ public class Invoice : IEntity
 
     public virtual DateTime Date { get; set; }
 
-    public virtual RouteType RouteType { get; set; }
+    public virtual int RouteType { get; set; }
 
     public virtual int Quantity { get; set; }
 

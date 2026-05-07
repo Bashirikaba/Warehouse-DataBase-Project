@@ -53,6 +53,7 @@ public static class QueryFilterHelper
                     SearchOperations.LessThan => "<",
                     _ => "=="
                 };
+
                 string predicate = $"{filter.Field} {op} @0";
                 query = query.Where(predicate, filter.Value);
             }

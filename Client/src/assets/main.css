@@ -20,6 +20,12 @@ a,
   gap: 20px;
 }
 
+.filter-field {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);

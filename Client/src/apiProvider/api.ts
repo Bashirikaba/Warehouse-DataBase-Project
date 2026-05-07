@@ -1,5 +1,5 @@
-import type { SearchData } from './types/interfaces'
-import type { Endpoints, Services } from './types/types'
+import type { ISearchData } from '../types/interfaces'
+import type { Endpoints, Services } from '../types/types'
 
 export default class Api {
   private static readonly baseUrl: string = 'http://localhost:5129/api'
@@ -9,11 +9,11 @@ export default class Api {
     headers: { 'Content-Type': 'application/json', 'Response-Type': 'application/json' },
     body: '{}',
   }
-
+  //TODO  удалить cypress и все остальное лишнее
   private static service: Services
   private static endpoint: Endpoints
 
-  static async getEntity<T>(service: Services, params?: SearchData): Promise<T[]> {
+  static async getEntity<T>(service: Services, params?: ISearchData): Promise<T[]> {
     let filledBody: RequestInit
     let response: Response
 

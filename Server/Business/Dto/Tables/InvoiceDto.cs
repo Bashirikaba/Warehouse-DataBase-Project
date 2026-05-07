@@ -17,7 +17,7 @@ public class InvoiceDto
 
     public DateTime Date { get; set; }
 
-    public RouteType RouteType { get; set; }
+    public int RouteType { get; set; }
 
     public int Quantity { get; set; }
 

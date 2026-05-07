@@ -1,16 +1,30 @@
 import Api from '@/apiProvider/api'
-import type { Position } from '@/apiProvider/types/interfaces'
+import { defaultSearchOpeartion } from '@/consts/searchOperations'
+import type { IPosition, ISearchData } from '@/types/interfaces'
 import { reactive, type Reactive } from 'vue'
 
-export function usePositionsOperations() {
-  const positions: Reactive<Position[]> = reactive([])
+export function usePositionsActions() {
+  const positions: Reactive<IPosition[]> = reactive([])
+
+  const filter: Reactive<ISearchData> = reactive({
+    StringParams: [
+      {
+        Field: 'Name',
+        Value: '',
+        Operation: defaultSearchOpeartion.Value,
+      },
+    ],
+    NumberParams: [],
+    DateParams: [],
+  })
 
   async function getAllPositions() {
-    const response: Position[] = await Api.getEntity<Position>('Positions')
+    const response: IPosition[] = await Api.getEntity<IPosition>('Positions')
 
     Object.assign(positions, response)
-    console.log(positions)
   }
 
-  return { positions, getAllPositions }
+  //  async function getPositionsWithFilter(searchData: SearchData) {}
+
+  return { positions, filter, getAllPositions }
 }

@@ -36,7 +36,6 @@ public class InvoiceMap : ClassMapping<Invoice>
         {
             m.Column("route");
             m.NotNullable(true);
-            m.Type<EnumType<RouteType>>();
         });
         Property(x => x.Quantity, m =>
         {

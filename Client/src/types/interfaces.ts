@@ -1,13 +1,13 @@
-import type { RouteType, SearchOperations } from './enums'
+import type { RouteTypeEnum, SearchOperationsEnum } from './enums'
 
-export interface Balance {
+export interface IBalance {
   Id?: number
   WarehouseName: number
   GoodNomenclatureNumber: number
   Quantity: number
 }
 
-export interface Good {
+export interface IGood {
   Id?: number
   Code: string
   NomenclatureNumber: string
@@ -15,23 +15,23 @@ export interface Good {
   Price: number
 }
 
-export interface Invoice {
+export interface IInvoice {
   Id?: number
   WarehouseName: string
   GoodNomenclatureNumber: string
   InvoiceNumber: string
   Date: Date
-  RouteType: RouteType
+  RouteType: RouteTypeEnum
   Quantity: number
   Cost: number
 }
 
-export interface Position {
+export interface IPosition {
   id?: number
   name: string
 }
 
-export interface Staff {
+export interface IStaff {
   Id?: number
   WarehouseName: string
   PositionName: string
@@ -39,13 +39,13 @@ export interface Staff {
   TIN: string
 }
 
-export interface Warehouse {
+export interface IWarehouse {
   Id?: number
   ManagerTIN: string
   Name: string
 }
 
-export interface ReorderGoodsReport {
+export interface IReorderGoodsReport {
   Name: string
   Code: string
   WarehouseName: string
@@ -53,7 +53,7 @@ export interface ReorderGoodsReport {
   SoldLast30Days: number
 }
 
-export interface StaffPerformanceReport {
+export interface IStaffPerformanceReport {
   FullName: string
   Position: string
   WarehouseName: string
@@ -64,9 +64,9 @@ export interface StaffPerformanceReport {
   LastWorkDate: Date
 }
 
-export interface WarehousePeriodReport {
+export interface IWarehousePeriodReport {
   WarehouseName: string
-  Route: RouteType
+  Route: RouteTypeEnum
   InvoicesCount: number
   UniqueGoods: number
   TotalQuantity: number
@@ -75,26 +75,37 @@ export interface WarehousePeriodReport {
   LastDate: Date
 }
 
-export interface SearchData {
-  StringParams: StringParam[]
-  NumberParams: NumberParam[]
-  DateParams: DateParam[]
+export interface ISearchData {
+  StringParams: IStringParam[]
+  NumberParams: INumberParam[]
+  DateParams: IDateParam[]
 }
 
-export interface DateParam {
+export interface IDateParam {
   Field: string
-  Value: Date
-  Operation: SearchOperations
+  Value: Date | null
+  Operation: SearchOperationsEnum
 }
 
-export interface NumberParam {
+export interface INumberParam {
   Field: string
-  Value: number
-  Operation: SearchOperations
+  Value: number | null
+  Operation: SearchOperationsEnum
 }
 
-export interface StringParam {
+export interface IStringParam {
   Field: string
   Value: string
-  Operation: SearchOperations
+  Operation: SearchOperationsEnum
+}
+
+export interface ISearchOperationsItem {
+  Value: SearchOperationsEnum
+  Name: string
+}
+
+export interface IFilterConfigItem {
+  Field: string
+  Label: string
+  Type: string
 }

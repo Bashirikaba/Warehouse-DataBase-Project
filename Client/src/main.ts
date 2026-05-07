@@ -3,13 +3,13 @@ import PrimeVue from 'primevue/config'
 
 import App from './App.vue'
 import router from './router'
-import Material from '@primevue/themes/material'
+import Aura from '@primevue/themes/aura'
 
 const app = createApp(App)
 
 app.use(PrimeVue, {
   theme: {
-    preset: Material,
+    preset: Aura,
     options: {
       darkModeSelector: '.my-app-dark',
     },
