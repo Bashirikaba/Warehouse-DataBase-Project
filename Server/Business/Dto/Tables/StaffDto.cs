@@ -1,3 +1,5 @@
+using Business.Models;
+
 namespace Business.Dto;
 
 /// <summary>
@@ -7,9 +9,9 @@ public class StaffDto
 {
     public int? Id { get; set; }
 
-    public required string WarehouseName { get; set; }
+    public required Warehouse Warehouse { get; set; }
 
-    public required string PositionName { get; set; }
+    public required Position Position { get; set; }
 
     public required string FullName { get; set; }
 

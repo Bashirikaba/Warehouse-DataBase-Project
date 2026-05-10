@@ -1,3 +1,5 @@
+using Business.Models;
+
 namespace Business.Dto;
 
 /// <summary>
@@ -7,9 +9,9 @@ public class BalanceDto
 {
     public int? Id { get; set; }
     
-    public required string WarehouseName { get; set; }
+    public required Warehouse Warehouse { get; set; }
 
-    public required string GoodNomenclatureNumber { get; set; }
+    public required Good Good { get; set; }
 
-    public int Quantity { get; set; }
+    public virtual int Quantity { get; set; }
 }

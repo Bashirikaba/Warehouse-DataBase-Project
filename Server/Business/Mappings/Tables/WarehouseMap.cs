@@ -21,12 +21,5 @@ public class WarehouseMap : ClassMapping<Warehouse>
             m.Unique(true);
             m.Length(50);
         });
-        ManyToOne(x => x.Manager, m =>
-        {
-            m.Column("manager_id");
-            m.NotNullable(false);
-            m.Cascade(Cascade.None);
-            m.NotFound(NotFoundMode.Ignore);
-        });
     }
 }

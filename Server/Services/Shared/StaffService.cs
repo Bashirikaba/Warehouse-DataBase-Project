@@ -26,8 +26,8 @@ public class StaffService : IEntityService<StaffDto>
     {
         _unitOfWork.BeginTransaction();
 
-        Warehouse? warehouse = _unitOfWork.GetRepository<Warehouse>().GetByFieldAsync("Name", dto.WarehouseName);
-        Position? position = _unitOfWork.GetRepository<Position>().GetByFieldAsync("Name", dto.PositionName);
+        Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
+        Position? position = await _unitOfWork.GetRepository<Position>().GetById(dto.Position.Id);
 
         if (warehouse is null || position is null) return 0;
 
@@ -64,8 +64,8 @@ public class StaffService : IEntityService<StaffDto>
         return await query.Select(i => new StaffDto
         {
             Id = i.Id,
-            WarehouseName = i.Warehouse.Name,
-            PositionName = i.Position.Name,
+            Warehouse = i.Warehouse,
+            Position = i.Position,
             FullName = i.FullName,
             TIN = i.TIN,
         }).ToListAsync();
@@ -75,20 +75,8 @@ public class StaffService : IEntityService<StaffDto>
     {
         if (dto.Id is not null)
         {
-            Warehouse? warehouse = _unitOfWork.GetRepository<Warehouse>().GetByFieldAsync("Name", dto.WarehouseName);
-            Position? position = _unitOfWork.GetRepository<Position>().GetByFieldAsync("Name", dto.PositionName);
-
-            if (warehouse is null)
-            {
-                dto.WarehouseName = "";
-                return dto;
-            }
-
-            if (position is null)
-            {
-                dto.PositionName = "";
-                return dto;
-            }
+            Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
+            Position? position = await _unitOfWork.GetRepository<Position>().GetById(dto.Position.Id);
 
             Staff staff = new()
             {

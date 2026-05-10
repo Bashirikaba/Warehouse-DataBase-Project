@@ -1,7 +1,6 @@
 using ApplicationData.Infrastructure;
 using Business.Infrastructure;
 using NHibernate;
-using System.Linq.Dynamic.Core;
 
 namespace ApplicationData.Shared;
 
@@ -14,10 +13,9 @@ public class Repository<T> : IRepository<T> where T : IEntity
         _session = session;
     }
 
-    public T? GetByFieldAsync(string fieldName, string value)
+    public async Task<T> GetById(int id)
     {
-        return Query().Where($"{fieldName} == @0", value).FirstOrDefault();
-        
+        return  await _session.GetAsync<T>(id);
     }
 
     public IQueryable<T> Query()

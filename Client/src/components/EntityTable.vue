@@ -15,6 +15,10 @@ defineProps<IEntityTableProps>()
       :header="row.Label"
       :data-type="row.Type"
       :hidden="row.Hidden"
-    ></Column>
+    >
+      <template v-if="row.Type == 'date'" #body="{ data }">
+        {{ new Date(data[row.Field]).toLocaleDateString() }}
+      </template>
+    </Column>
   </DataTable>
 </template>

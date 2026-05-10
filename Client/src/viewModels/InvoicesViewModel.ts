@@ -10,12 +10,12 @@ export function useInvoicesActions() {
   const filter: Reactive<ISearchData> = reactive({
     StringParams: [
       {
-        Field: 'WarehouseName',
+        Field: 'Warehouse.Name',
         Value: '',
         Operation: defaultSearchOpeartion.Value,
       },
       {
-        Field: 'GoodNomenclatureNumber',
+        Field: 'Good.NomenclatureNumber',
         Value: '',
         Operation: defaultSearchOpeartion.Value,
       },

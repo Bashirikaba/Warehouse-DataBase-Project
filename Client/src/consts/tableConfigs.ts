@@ -22,12 +22,12 @@ export const invoicesConfig: ITableConfigItem[] = [
     Hidden: true,
   },
   {
-    Field: 'WarehouseName',
+    Field: 'Warehouse.Name',
     Label: 'Название склада',
     Type: 'string',
   },
   {
-    Field: 'GoodNomenclatureNumber',
+    Field: 'Good.NomenclatureNumber',
     Label: 'Ном.№ товара',
     Type: 'string',
   },

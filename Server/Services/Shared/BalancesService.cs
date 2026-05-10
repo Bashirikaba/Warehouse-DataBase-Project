@@ -26,8 +26,8 @@ public class BalancesService : IEntityService<BalanceDto>
     {
         _unitOfWork.BeginTransaction();
 
-        Warehouse? warehouse = _unitOfWork.GetRepository<Warehouse>().GetByFieldAsync("Name", dto.WarehouseName);
-        Good? good = _unitOfWork.GetRepository<Good>().GetByFieldAsync("NomenclatureNumber", dto.GoodNomenclatureNumber);
+        Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
+        Good? good = await _unitOfWork.GetRepository<Good>().GetById(dto.Warehouse.Id);
 
         if (warehouse is null || good is null) return 0;
 
@@ -64,8 +64,8 @@ public class BalancesService : IEntityService<BalanceDto>
         return await query.Select(i => new BalanceDto
         {
             Id = i.Id,
-            WarehouseName = i.Warehouse.Name,
-            GoodNomenclatureNumber = i.Good.NomenclatureNumber,
+            Warehouse = i.Warehouse,
+            Good = i.Good,
             Quantity = i.Quantity,
         }).ToListAsync();
     }
@@ -74,20 +74,8 @@ public class BalancesService : IEntityService<BalanceDto>
     {
         if (dto.Id is not null)
         {
-            Warehouse? warehouse = _unitOfWork.GetRepository<Warehouse>().GetByFieldAsync("Name", dto.WarehouseName);
-            Good? good = _unitOfWork.GetRepository<Good>().GetByFieldAsync("NomenclatureNumber", dto.GoodNomenclatureNumber);
-
-            if (warehouse is null)
-            {
-                dto.WarehouseName = "";
-                return dto;
-            }
-
-            if (good is null)
-            {
-                dto.GoodNomenclatureNumber = "";
-                return dto;
-            }
+            Warehouse warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
+            Good good = await _unitOfWork.GetRepository<Good>().GetById(dto.Good.Id);
 
             Balance balance = new()
             {

@@ -26,11 +26,8 @@ public class WarehousesService : IEntityService<WarehouseDto>
     {
         _unitOfWork.BeginTransaction();
 
-        Staff? staff = _unitOfWork.GetRepository<Staff>().GetByFieldAsync("TIN", dto.ManagerTIN);
-
         Warehouse? warehouse = new()
         {
-            Manager = staff,
             Name = dto.Name,
         };
 
@@ -59,7 +56,6 @@ public class WarehousesService : IEntityService<WarehouseDto>
         return await query.Select(g => new WarehouseDto
         {
             Id = g.Id,
-            ManagerTIN = g.Manager != null ? g.Manager.TIN : null,
             Name = g.Name,
         }).ToListAsync();
     }
@@ -68,12 +64,9 @@ public class WarehousesService : IEntityService<WarehouseDto>
     {
         if (dto.Id is not null)
         {
-            Staff? staff = _unitOfWork.GetRepository<Staff>().GetByFieldAsync("TIN", dto.ManagerTIN);
-
             Warehouse warehouse = new()
             {
                 Id = Convert.ToInt32(dto.Id),
-                Manager = staff,
                 Name = dto.Name,
             };
             _unitOfWork.BeginTransaction();

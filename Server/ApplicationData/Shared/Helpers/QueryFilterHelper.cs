@@ -65,6 +65,16 @@ public static class QueryFilterHelper
     {
         if (fieldName == "Id") return false;
 
-        return typeof(T).GetProperty(fieldName, BindingFlags.Public | BindingFlags.Instance) != null;
+        var parts = fieldName.Split('.');
+        Type currentType = typeof(T);
+
+        foreach (var part in parts)
+        {
+            var property = currentType.GetProperty(part, BindingFlags.Public | BindingFlags.Instance);
+            if (property == null) return false;
+            currentType = property.PropertyType;
+        }
+
+        return true;
     }
 }

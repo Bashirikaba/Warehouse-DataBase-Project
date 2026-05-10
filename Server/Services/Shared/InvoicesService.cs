@@ -26,8 +26,8 @@ public class InvoicesService : IEntityService<InvoiceDto>
     {
         _unitOfWork.BeginTransaction();
 
-        Warehouse? warehouse = _unitOfWork.GetRepository<Warehouse>().GetByFieldAsync("Name", dto.WarehouseName);
-        Good? good = _unitOfWork.GetRepository<Good>().GetByFieldAsync("NomenclatureNumber", dto.GoodNomenclatureNumber);
+        Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
+        Good? good = await _unitOfWork.GetRepository<Good>().GetById(dto.Good.Id);
 
         if (warehouse is null || good is null) return 0;
 
@@ -69,8 +69,8 @@ public class InvoicesService : IEntityService<InvoiceDto>
         return await query.Select(i => new InvoiceDto
         {
             Id = i.Id,
-            WarehouseName = i.Warehouse.Name,
-            GoodNomenclatureNumber = i.Good.NomenclatureNumber,
+            Warehouse = i.Warehouse,
+            Good = i.Good,
             InvoiceNumber = i.InvoiceNumber,
             Date = i.Date,
             RouteType = i.RouteType,
@@ -83,20 +83,8 @@ public class InvoicesService : IEntityService<InvoiceDto>
     {
         if (dto.Id is not null)
         {
-            Warehouse? warehouse = _unitOfWork.GetRepository<Warehouse>().GetByFieldAsync("Name", dto.WarehouseName);
-            Good? good = _unitOfWork.GetRepository<Good>().GetByFieldAsync("NomenclatureNumber", dto.GoodNomenclatureNumber);
-
-            if (warehouse is null)
-            {
-                dto.WarehouseName = "";
-                return dto;
-            }
-
-            if (good is null)
-            {
-                dto.GoodNomenclatureNumber = "";
-                return dto;
-            }
+            Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
+            Good? good = await _unitOfWork.GetRepository<Good>().GetById(dto.Good.Id);
 
             Invoice invoice = new()
             {

@@ -10,8 +10,8 @@ export interface IReport {
 
 export interface IBalance extends IEntity {
   Id?: number
-  WarehouseName: number
-  GoodNomenclatureNumber: number
+  Warehouse: IWarehouse
+  Good: IGood
   Quantity: number
 }
 
@@ -25,8 +25,8 @@ export interface IGood extends IEntity {
 
 export interface IInvoice extends IEntity {
   Id?: number
-  WarehouseName: string
-  GoodNomenclatureNumber: string
+  Warehouse: IWarehouse
+  Good: IGood
   InvoiceNumber: string
   Date: Date
   RouteType: number
@@ -41,7 +41,7 @@ export interface IPosition extends IEntity {
 
 export interface IStaff extends IEntity {
   Id?: number
-  WarehouseName: string
+  Warehouse: IWarehouse
   PositionName: string
   FullName: string
   TIN: string
@@ -49,7 +49,6 @@ export interface IStaff extends IEntity {
 
 export interface IWarehouse extends IEntity {
   Id?: number
-  ManagerTIN: string
   Name: string
 }
 
