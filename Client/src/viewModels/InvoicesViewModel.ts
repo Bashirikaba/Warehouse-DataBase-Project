@@ -1,6 +1,7 @@
 import Api from '@/apiProvider/api'
 import { defaultSearchOpeartion } from '@/consts/searchOperations'
 import type { IInvoice, ISearchData } from '@/types/interfaces'
+import useFilterHelper from '@/hooks/useFilterHelper'
 import { reactive, type Reactive } from 'vue'
 
 export function useInvoicesActions() {
@@ -26,6 +27,11 @@ export function useInvoicesActions() {
     ],
     NumberParams: [
       {
+        Field: 'RouteType',
+        Value: null,
+        Operation: defaultSearchOpeartion.Value,
+      },
+      {
         Field: 'Quantity',
         Value: null,
         Operation: defaultSearchOpeartion.Value,
@@ -45,13 +51,21 @@ export function useInvoicesActions() {
     ],
   })
 
-  async function getAllPositions() {
-    const response: IPosition[] = await Api.getEntity<IPosition>('Positions')
+  async function getAllInvoices() {
+    const response: IInvoice[] = await Api.getEntity<IInvoice>('Invoices')
 
-    Object.assign(positions, response)
+    Object.assign(invoices, response)
   }
 
-  //  async function getPositionsWithFilter(searchData: SearchData) {}
+  async function getInvoicesWithFilter() {
+    const { getValidatedSearchData } = useFilterHelper(filter)
+    const response: IInvoice[] = await Api.getEntity<IInvoice>('Invoices', getValidatedSearchData())
 
-  return { positions, filter, getAllPositions }
+    console.log(response)
+
+    invoices.length = 0
+    Object.assign(invoices, response)
+  }
+
+  return { invoices, filter, getAllInvoices, getInvoicesWithFilter }
 }

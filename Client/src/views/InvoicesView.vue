@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { usePositionsActions } from '../viewModels/PositionsViewModel'
+import { useInvoicesActions } from '../viewModels/InvoicesViewModel'
 import StringFilterField from '@/components/StringFilterField.vue'
-import { positionsFilterConfig } from '@/consts/filterConfigs'
+import { invoicesConfig } from '@/consts/tableConfigs'
 import useFilterHelper from '../hooks/useFilterHelper'
+import EntityTable from '@/components/EntityTable.vue'
+import NumberFilterField from '@/components/NumberFilterField.vue'
+import DateFilterField from '@/components/DateFilterField.vue'
 
-const { positions, filter, getAllPositions } = usePositionsActions()
-const { getStringParam } = useFilterHelper(filter)
+const { invoices, filter, getAllInvoices, getInvoicesWithFilter } = useInvoicesActions()
+const { getStringParam, getNumberParam, getDateParam } = useFilterHelper(filter)
 
 onMounted(() => {
-  getAllPositions()
+  getAllInvoices()
 })
 </script>
 
@@ -17,18 +20,36 @@ onMounted(() => {
   <Card>
     <template #content>
       <div class="entity-title">
-        <h1>Должности</h1>
+        <h1>Накладные</h1>
         <Button label="На домашнюю" as="router-link" :to="{ name: 'Home' }" />
       </div>
       <Divider></Divider>
-      <div class="filters" v-for="field in positionsFilterConfig" :key="field.Field">
-        <StringFilterField :model-value="getStringParam(field.Field)" :label="field.Label" />
+      <div class="filters" style="display: flex; flex-direction: column; gap: 10px">
+        <div
+          class="filter"
+          v-for="row in invoicesConfig.filter((r) => r.Field != 'Id')"
+          :key="row.Field"
+        >
+          <StringFilterField
+            v-if="row.Type == 'string'"
+            :model-value="getStringParam(row.Field)"
+            :label="row.Label"
+          />
+          <NumberFilterField
+            v-if="row.Type == 'number'"
+            :model-value="getNumberParam(row.Field)"
+            :label="row.Label"
+          />
+          <DateFilterField
+            v-if="row.Type == 'date'"
+            :model-value="getDateParam(row.Field)"
+            :label="row.Label"
+          />
+        </div>
       </div>
-      <Button label="Поиск" style="margin-top: 1rem"></Button>
+      <Button label="Поиск" style="margin-top: 1rem" @click="getInvoicesWithFilter()"></Button>
       <Divider></Divider>
-      <DataTable :value="positions" striped-rows size="small">
-        <Column field="name" header="Должность"></Column>
-      </DataTable>
+      <EntityTable v-model="invoices" :config="invoicesConfig"></EntityTable>
     </template>
   </Card>
 </template>

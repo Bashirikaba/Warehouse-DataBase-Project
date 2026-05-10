@@ -4,7 +4,7 @@ interface useFilterHelperProp {
   getStringParam: (name: string) => IStringParam
   getNumberParam: (name: string) => INumberParam
   getDateParam: (name: string) => IDateParam
-  setupSearchData: () => ISearchData
+  getValidatedSearchData: () => ISearchData
   resetFilter: () => void
 }
 
@@ -21,7 +21,7 @@ export default function useFilterHelper(filter: ISearchData): useFilterHelperPro
     return filter.DateParams.find((f) => f.Field == name)!
   }
 
-  function setupSearchData() {
+  function getValidatedSearchData() {
     return {
       StringParams: filter.StringParams.filter((p) => p.Value),
       NumberParams: filter.NumberParams.filter((p) => p.Value !== null),
@@ -35,5 +35,5 @@ export default function useFilterHelper(filter: ISearchData): useFilterHelperPro
     filter.DateParams.forEach((p) => (p.Value = null))
   }
 
-  return { getStringParam, getNumberParam, getDateParam, setupSearchData, resetFilter }
+  return { getStringParam, getNumberParam, getDateParam, getValidatedSearchData, resetFilter }
 }

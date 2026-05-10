@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 import { usePositionsActions } from '../viewModels/PositionsViewModel'
 import StringFilterField from '@/components/StringFilterField.vue'
-import { positionsFilterConfig } from '@/consts/filterConfigs'
+import { positionsConfig } from '@/consts/tableConfigs'
 import useFilterHelper from '../hooks/useFilterHelper'
 
 const { positions, filter, getAllPositions } = usePositionsActions()
@@ -21,7 +21,7 @@ onMounted(() => {
         <Button label="На домашнюю" as="router-link" :to="{ name: 'Home' }" />
       </div>
       <Divider></Divider>
-      <div class="filters" v-for="field in positionsFilterConfig" :key="field.Field">
+      <div class="filters" v-for="field in positionsConfig" :key="field.Field">
         <StringFilterField :model-value="getStringParam(field.Field)" :label="field.Label" />
       </div>
       <Button label="Поиск" style="margin-top: 1rem"></Button>

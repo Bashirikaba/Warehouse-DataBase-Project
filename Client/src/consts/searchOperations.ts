@@ -5,7 +5,6 @@ export const numberSearchOperations: ISearchOperationsItem[] = [
   { Value: SearchOperationsEnum.MoreThan, Name: 'Больше' },
   { Value: SearchOperationsEnum.LessThan, Name: 'Меньше' },
   { Value: SearchOperationsEnum.Equal, Name: 'Равно' },
-  { Value: SearchOperationsEnum.Like, Name: 'Содержит' },
 ]
 
 export const stringSearchOperations: ISearchOperationsItem[] = [

@@ -1,4 +1,4 @@
-import type { ISearchData } from '../types/interfaces'
+import type { ISearchData, ISearchDataDto } from '../types/interfaces'
 import type { Endpoints, Services } from '../types/types'
 
 export default class Api {
@@ -9,7 +9,7 @@ export default class Api {
     headers: { 'Content-Type': 'application/json', 'Response-Type': 'application/json' },
     body: '{}',
   }
-  //TODO  удалить cypress и все остальное лишнее
+
   private static service: Services
   private static endpoint: Endpoints
 
@@ -21,7 +21,8 @@ export default class Api {
     this.service = service
 
     if (params) {
-      filledBody = { ...this.options, body: JSON.stringify(params) }
+      const dto: ISearchDataDto = { dto: params }
+      filledBody = { ...this.options, body: JSON.stringify(dto) }
       response = await fetch(this.buildQuery(), filledBody)
     } else {
       response = await fetch(this.buildQuery(), this.options)

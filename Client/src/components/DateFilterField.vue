@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { numberSearchOperations } from '../consts/searchOperations'
+import { dateSearchOperations } from '../consts/searchOperations'
 import { useId } from 'vue'
 import type { IDateParam } from '@/types/interfaces'
 
@@ -15,13 +15,13 @@ defineProps<IDateFilterProps>()
 <template>
   <div class="filter-field">
     <FloatLabel variant="on">
-      <DatePicker v-model="param.Value" show-icon fluid :max-date="new Date()" />
+      <DatePicker size="large" v-model="param.Value" show-icon fluid :max-date="new Date()" />
       <label :for="uid">{{ label }}</label>
     </FloatLabel>
     <Select
       :id="uid"
       v-model="param.Operation"
-      :options="numberSearchOperations"
+      :options="dateSearchOperations"
       option-value="Value"
       option-label="Name"
     />

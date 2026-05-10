@@ -26,7 +26,10 @@ AutoRouteRegistry.Build(servicesTypes);
 
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 builder.Services.AddSingleton(NHibernateHelper.SessionFactory);
 builder.Services.AddScoped(sp => NHibernateHelper.OpenSession());
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -38,8 +41,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.AllowAnyOrigin() 
-                  .AllowAnyMethod() 
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
                   .AllowAnyHeader();
         });
 });

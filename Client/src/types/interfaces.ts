@@ -1,13 +1,21 @@
-import type { RouteTypeEnum, SearchOperationsEnum } from './enums'
+import type { SearchOperationsEnum } from './enums'
 
-export interface IBalance {
+export interface IEntity {
+  Id?: number
+}
+
+export interface IReport {
+  WarehouseName: string
+}
+
+export interface IBalance extends IEntity {
   Id?: number
   WarehouseName: number
   GoodNomenclatureNumber: number
   Quantity: number
 }
 
-export interface IGood {
+export interface IGood extends IEntity {
   Id?: number
   Code: string
   NomenclatureNumber: string
@@ -15,23 +23,23 @@ export interface IGood {
   Price: number
 }
 
-export interface IInvoice {
+export interface IInvoice extends IEntity {
   Id?: number
   WarehouseName: string
   GoodNomenclatureNumber: string
   InvoiceNumber: string
   Date: Date
-  RouteType: RouteTypeEnum
+  RouteType: number
   Quantity: number
   Cost: number
 }
 
-export interface IPosition {
-  id?: number
-  name: string
+export interface IPosition extends IEntity {
+  Id?: number
+  Name: string
 }
 
-export interface IStaff {
+export interface IStaff extends IEntity {
   Id?: number
   WarehouseName: string
   PositionName: string
@@ -39,13 +47,13 @@ export interface IStaff {
   TIN: string
 }
 
-export interface IWarehouse {
+export interface IWarehouse extends IEntity {
   Id?: number
   ManagerTIN: string
   Name: string
 }
 
-export interface IReorderGoodsReport {
+export interface IReorderGoodsReport extends IReport {
   Name: string
   Code: string
   WarehouseName: string
@@ -53,7 +61,7 @@ export interface IReorderGoodsReport {
   SoldLast30Days: number
 }
 
-export interface IStaffPerformanceReport {
+export interface IStaffPerformanceReport extends IReport {
   FullName: string
   Position: string
   WarehouseName: string
@@ -64,15 +72,19 @@ export interface IStaffPerformanceReport {
   LastWorkDate: Date
 }
 
-export interface IWarehousePeriodReport {
+export interface IWarehousePeriodReport extends IReport {
   WarehouseName: string
-  Route: RouteTypeEnum
+  Route: number
   InvoicesCount: number
   UniqueGoods: number
   TotalQuantity: number
   TotalSum: number
   FirstDate: Date
   LastDate: Date
+}
+
+export interface ISearchDataDto {
+  dto: ISearchData
 }
 
 export interface ISearchData {
@@ -104,8 +116,9 @@ export interface ISearchOperationsItem {
   Name: string
 }
 
-export interface IFilterConfigItem {
+export interface ITableConfigItem {
   Field: string
   Label: string
   Type: string
+  Hidden?: boolean
 }

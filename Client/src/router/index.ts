@@ -16,6 +16,11 @@ const router = createRouter({
           name: 'Positions',
           component: () => import('../views/PositionsView.vue'),
         },
+        {
+          path: 'Invoices',
+          name: 'Invoices',
+          component: () => import('../views/InvoicesView.vue'),
+        },
       ],
     },
   ],

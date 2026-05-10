@@ -1,4 +1,3 @@
-using Business.Enums;
 using Business.Infrastructure;
 
 namespace Business.Models;
