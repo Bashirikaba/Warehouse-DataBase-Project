@@ -49,7 +49,7 @@ onMounted(() => {
       </div>
       <Button label="Поиск" style="margin-top: 1rem" @click="getInvoicesWithFilter()"></Button>
       <Divider></Divider>
-      <EntityTable v-model="invoices" :config="invoicesConfig"></EntityTable>
+      <EntityTable v-model="invoices" api-service="Invoices" :config="invoicesConfig"></EntityTable>
     </template>
   </Card>
 </template>

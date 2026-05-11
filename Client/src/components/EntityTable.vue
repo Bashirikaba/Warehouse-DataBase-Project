@@ -1,13 +1,35 @@
 <script setup lang="ts">
+import Api from '@/apiProvider/api'
 import type { IEntity, ITableConfigItem } from '@/types/interfaces'
+import type { Service } from '@/types/types'
+import type { DataTableRowEditInitEvent } from 'primevue'
+import { ref, type Ref } from 'vue'
+
 interface IEntityTableProps {
   config: ITableConfigItem[]
+  apiService: Service
 }
+
 const entityList = defineModel<IEntity[]>({ required: true })
-defineProps<IEntityTableProps>()
+const props = defineProps<IEntityTableProps>()
+const editingRows: Ref<IEntity[]> = ref([])
+Api.setService(props.apiService)
 </script>
 <template>
-  <DataTable :value="entityList" striped-rows size="small" show-gridlines>
+  <DataTable
+    :editing-rows="editingRows"
+    :value="entityList"
+    striped-rows
+    size="small"
+    show-gridlines
+    data-key="Id"
+    edit-mode="row"
+    @row-edit-init="
+      (e: DataTableRowEditInitEvent) => {
+        editingRows = [e.data]
+      }
+    "
+  >
     <Column
       v-for="row in config"
       :key="row.Field"
@@ -20,5 +42,21 @@ defineProps<IEntityTableProps>()
         {{ new Date(data[row.Field]).toLocaleDateString() }}
       </template>
     </Column>
+    <Column row-editor></Column>
+    <Column>
+      <template #body="{ data }">
+        <Button
+          size="small"
+          icon="pi pi-trash"
+          variant="outlined"
+          rounded
+          severity="danger"
+          @click="
+            async () => {
+              await Api.deleteEntity(data.Id)
+            }
+          "
+        /> </template
+    ></Column>
   </DataTable>
 </template>

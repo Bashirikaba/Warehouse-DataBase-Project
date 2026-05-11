@@ -6,7 +6,7 @@ public interface IRepository<T> where T : IEntity
 {
     IQueryable<T> Query();
 
-    Task<T> GetById(int id);
+    Task<T> GetByIdAsync(int id);
 
     Task<object?> InsertAsync(T entity);
 

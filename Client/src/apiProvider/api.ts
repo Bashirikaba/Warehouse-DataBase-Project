@@ -1,5 +1,5 @@
 import type { ISearchData, ISearchDataDto } from '../types/interfaces'
-import type { Endpoints, Services } from '../types/types'
+import type { Endpoint, Service } from '../types/types'
 
 export default class Api {
   private static readonly baseUrl: string = 'http://localhost:5129/api'
@@ -10,15 +10,18 @@ export default class Api {
     body: '{}',
   }
 
-  private static service: Services
-  private static endpoint: Endpoints
+  private static service: Service
+  private static endpoint: Endpoint
 
-  static async getEntity<T>(service: Services, params?: ISearchData): Promise<T[]> {
+  static setService(service: Service): void {
+    this.service = service
+  }
+
+  static async getEntity<T>(params?: ISearchData): Promise<T[]> {
     let filledBody: RequestInit
     let response: Response
 
     this.endpoint = 'Get'
-    this.service = service
 
     if (params) {
       const dto: ISearchDataDto = { dto: params }
@@ -29,6 +32,13 @@ export default class Api {
     }
 
     return (await response.json()) as T[]
+  }
+
+  static async deleteEntity(id: number) {
+    this.endpoint = 'Delete'
+
+    const filledBody: RequestInit = { ...this.options, body: JSON.stringify({ id: id }) }
+    await fetch(this.buildQuery(), filledBody)
   }
 
   private static buildQuery(): string {

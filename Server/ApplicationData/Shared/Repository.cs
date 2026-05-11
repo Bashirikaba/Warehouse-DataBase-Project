@@ -13,7 +13,7 @@ public class Repository<T> : IRepository<T> where T : IEntity
         _session = session;
     }
 
-    public async Task<T> GetById(int id)
+    public async Task<T> GetByIdAsync(int id)
     {
         return  await _session.GetAsync<T>(id);
     }

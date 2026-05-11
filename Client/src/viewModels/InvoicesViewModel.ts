@@ -51,17 +51,17 @@ export function useInvoicesActions() {
     ],
   })
 
+  Api.setService('Invoices')
+
   async function getAllInvoices() {
-    const response: IInvoice[] = await Api.getEntity<IInvoice>('Invoices')
+    const response: IInvoice[] = await Api.getEntity<IInvoice>()
 
     Object.assign(invoices, response)
   }
 
   async function getInvoicesWithFilter() {
     const { getValidatedSearchData } = useFilterHelper(filter)
-    const response: IInvoice[] = await Api.getEntity<IInvoice>('Invoices', getValidatedSearchData())
-
-    console.log(response)
+    const response: IInvoice[] = await Api.getEntity<IInvoice>(getValidatedSearchData())
 
     invoices.length = 0
     Object.assign(invoices, response)

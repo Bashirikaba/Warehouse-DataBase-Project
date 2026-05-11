@@ -37,6 +37,5 @@ public class BalanceMap : ClassMapping<Balance>
             });
             m.NotNullable(true);
         });
-        // TODO Уникальное ограничение (warehouse_id, goods_id) можно задать через Component или в конфигурации схемы.
     }
 }

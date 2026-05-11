@@ -26,8 +26,8 @@ public class InvoicesService : IEntityService<InvoiceDto>
     {
         _unitOfWork.BeginTransaction();
 
-        Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
-        Good? good = await _unitOfWork.GetRepository<Good>().GetById(dto.Good.Id);
+        Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetByIdAsync(dto.Warehouse.Id);
+        Good? good = await _unitOfWork.GetRepository<Good>().GetByIdAsync(dto.Good.Id);
 
         if (warehouse is null || good is null) return 0;
 
@@ -83,8 +83,8 @@ public class InvoicesService : IEntityService<InvoiceDto>
     {
         if (dto.Id is not null)
         {
-            Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetById(dto.Warehouse.Id);
-            Good? good = await _unitOfWork.GetRepository<Good>().GetById(dto.Good.Id);
+            Warehouse? warehouse = await _unitOfWork.GetRepository<Warehouse>().GetByIdAsync(dto.Warehouse.Id);
+            Good? good = await _unitOfWork.GetRepository<Good>().GetByIdAsync(dto.Good.Id);
 
             Invoice invoice = new()
             {

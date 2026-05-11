@@ -1,3 +1,3 @@
-export type Endpoints = 'Add' | 'Get' | 'Update' | 'Delete'
+export type Endpoint = 'Add' | 'Get' | 'Update' | 'Delete'
 
-export type Services = 'Balances' | 'Goods' | 'Invoices' | 'Positions' | 'Staff' | 'Warehouses'
+export type Service = 'Balances' | 'Goods' | 'Invoices' | 'Positions' | 'Staff' | 'Warehouses'
