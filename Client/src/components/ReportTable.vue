@@ -4,65 +4,49 @@ import useFilterHelper from '@/hooks/useFilterHelper'
 import type { IEntity, ISearchData, ITableConfigItem } from '@/types/interfaces'
 import { onMounted, reactive, ref, type Reactive, type Ref } from 'vue'
 import EnumFilterField from './EnumFilterField.vue'
-import EntityFormDialog from './EntityFormDialog.vue'
 import type { Service } from '@/types/types'
 const { initFilter, getStringParam, getNumberParam, getDateParam, getValidatedSearchData } =
   useFilterHelper()
 
-interface IEntityTableProps {
+interface IReportTableProps {
   config: ITableConfigItem[]
   apiService: Service
+  report: Report
 }
 
-const props = defineProps<IEntityTableProps>()
+const props = defineProps<IReportTableProps>()
 const entities: Reactive<IEntity[]> = reactive([])
 const isEntitiesLoading: Ref<boolean> = ref(true)
-const selectedEntity: Ref<IEntity | undefined> = ref(undefined)
-const isDialogVisible: Ref<boolean> = ref(false)
 const filter: Reactive<ISearchData> = reactive(initFilter(props.config))
 
 Api.setService(props.apiService)
 
 onMounted(() => {
-  getAllEntities()
+  buildReport()
 })
 
-async function getAllEntities() {
+async function buildReport() {
   isEntitiesLoading.value = true
-  const response: IEntity[] = await Api.getEntity<IEntity>()
+  const response: IEntity[] = await Api.getReport<IEntity>(props.report)
 
   Object.assign(entities, response)
   isEntitiesLoading.value = false
 }
 
-async function getFilteredEntities() {
+async function buildFilteredReport() {
   isEntitiesLoading.value = true
-  const response: IEntity[] = await Api.getEntity<IEntity>(getValidatedSearchData(filter))
+  const response: IEntity[] = await Api.getReport<IEntity>(
+    props.report,
+    getValidatedSearchData(filter),
+  )
 
   entities.length = 0
   Object.assign(entities, response)
   isEntitiesLoading.value = false
 }
-
-async function deleteEntity(id: number) {
-  await Api.deleteEntity(id)
-  await getAllEntities()
-}
-
-function editEntity(entity: IEntity) {
-  selectedEntity.value = entity
-  isDialogVisible.value = true
-}
-
-function createEntity() {
-  selectedEntity.value = undefined
-  isDialogVisible.value = true
-}
-
-console.log(props.config)
 </script>
 <template>
-  <div @keydown.enter="getFilteredEntities()">
+  <div @keydown.enter="buildFilteredReport()">
     <div class="fields">
       <div class="filter" v-for="row in config.filter((r) => r.Field != 'Id')" :key="row.Field">
         <StringFilterField
@@ -88,8 +72,7 @@ console.log(props.config)
       </div>
     </div>
     <div style="display: flex; gap: 10px; margin-top: 1rem">
-      <Button icon="pi pi-search" label="Поиск" @click="getFilteredEntities()"></Button>
-      <Button icon="pi pi-plus" text label="Создать запись" @click="createEntity()"></Button>
+      <Button icon="pi pi-search" label="Поиск" @click="buildFilteredReport()"></Button>
     </div>
     <Divider></Divider>
     <DataTable
@@ -128,38 +111,6 @@ console.log(props.config)
           </div>
         </template>
       </Column>
-      <Column>
-        <template #body="{ data }">
-          <div class="filter-field">
-            <Button
-              size="small"
-              variant="outlined"
-              icon="pi pi-pencil"
-              rounded
-              severity="severity"
-              @click="editEntity(data)"
-            />
-            <Button
-              size="small"
-              variant="outlined"
-              icon="pi pi-trash"
-              rounded
-              severity="danger"
-              @click="
-                async () => {
-                  await deleteEntity(data.Id)
-                }
-              "
-            />
-          </div> </template
-      ></Column>
     </DataTable>
-    <EntityFormDialog
-      v-model="isDialogVisible"
-      :edit-data="selectedEntity"
-      :config="config"
-      :api-service="props.apiService"
-      @update="getAllEntities()"
-    ></EntityFormDialog>
   </div>
 </template>

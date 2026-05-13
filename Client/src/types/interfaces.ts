@@ -1,4 +1,5 @@
 import type { SearchOperationsEnum } from './enums'
+import type { Service } from './types'
 
 export interface IEntity {
   Id?: number
@@ -86,6 +87,10 @@ export interface ISearchDataDto {
   dto: ISearchData
 }
 
+export interface IEntityDto {
+  dto: IEntity
+}
+
 export interface ISearchData {
   StringParams: IStringParam[]
   NumberParams: INumberParam[]
@@ -120,4 +125,7 @@ export interface ITableConfigItem {
   Label: string
   Type: string
   Hidden?: boolean
+  Numeric?: boolean
+  Enum?: boolean
+  NestedEntity?: Service
 }

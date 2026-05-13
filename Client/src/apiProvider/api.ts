@@ -1,5 +1,5 @@
-import type { ISearchData, ISearchDataDto } from '../types/interfaces'
-import type { Endpoint, Service } from '../types/types'
+import type { IEntity, IEntityDto, ISearchData, ISearchDataDto } from '../types/interfaces'
+import type { Endpoint, Report, Service } from '../types/types'
 
 export default class Api {
   private static readonly baseUrl: string = 'http://localhost:5129/api'
@@ -11,7 +11,7 @@ export default class Api {
   }
 
   private static service: Service
-  private static endpoint: Endpoint
+  private static endpoint: Endpoint | Report
 
   static setService(service: Service): void {
     this.service = service
@@ -34,11 +34,63 @@ export default class Api {
     return (await response.json()) as T[]
   }
 
-  static async deleteEntity(id: number) {
+  static async createEntity<T>(entity?: IEntity): Promise<T[]> {
+    let filledBody: RequestInit
+    let response: Response
+
+    this.endpoint = 'Add'
+
+    if (entity) {
+      const dto: IEntityDto = { dto: entity }
+      filledBody = { ...this.options, body: JSON.stringify(dto) }
+      response = await fetch(this.buildQuery(), filledBody)
+    } else {
+      response = await fetch(this.buildQuery(), this.options)
+    }
+
+    return (await response.json()) as T[]
+  }
+
+  static async updateEntity<T>(entity?: IEntity): Promise<T[]> {
+    let filledBody: RequestInit
+    let response: Response
+
+    this.endpoint = 'Update'
+
+    if (entity) {
+      const dto: IEntityDto = { dto: entity }
+      filledBody = { ...this.options, body: JSON.stringify(dto) }
+      response = await fetch(this.buildQuery(), filledBody)
+    } else {
+      response = await fetch(this.buildQuery(), this.options)
+    }
+
+    return (await response.json()) as T[]
+  }
+
+  static async deleteEntity(entityId: number) {
     this.endpoint = 'Delete'
 
-    const filledBody: RequestInit = { ...this.options, body: JSON.stringify({ id: id }) }
+    const filledBody: RequestInit = { ...this.options, body: JSON.stringify({ id: entityId }) }
+
     await fetch(this.buildQuery(), filledBody)
+  }
+
+  static async getReport<T>(report: Report, params?: ISearchData): Promise<T[]> {
+    let filledBody: RequestInit
+    let response: Response
+
+    this.endpoint = report
+
+    if (params) {
+      const dto: ISearchDataDto = { dto: params }
+      filledBody = { ...this.options, body: JSON.stringify(dto) }
+      response = await fetch(this.buildQuery(), filledBody)
+    } else {
+      response = await fetch(this.buildQuery(), this.options)
+    }
+
+    return (await response.json()) as T[]
   }
 
   private static buildQuery(): string {

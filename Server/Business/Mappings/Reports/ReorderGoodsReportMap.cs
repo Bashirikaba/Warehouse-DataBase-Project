@@ -8,12 +8,12 @@ public class ReorderGoodsReportMap : ClassMapping<ReorderGoodsReport>
     public ReorderGoodsReportMap()
     {
         Mutable(false);
-        Table("warehouse_period_map");
+        Table("reorder_goods_report");
         ComposedId(map =>
         {
-            map.Property(p => p.Name);
-            map.Property(p => p.Code);
-            map.Property(p => p.WarehouseName);
+            map.Property(p => p.Name, m => m.Column("name"));
+            map.Property(p => p.Code, m => m.Column("code"));
+            map.Property(p => p.WarehouseName, m => m.Column("warehouse_name"));
         });
         Property(x => x.Quantity, m =>
         {

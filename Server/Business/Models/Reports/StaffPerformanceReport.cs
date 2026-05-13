@@ -10,7 +10,7 @@ public class StaffPerformanceReport : IReport
 
     public virtual required string WarehouseName { get; set; }
 
-    public virtual int DocumentProcessed { get; set; }
+    public virtual int DocumentsProcessed { get; set; }
 
     public virtual int UniqueGoodsHandled { get; set; }
 

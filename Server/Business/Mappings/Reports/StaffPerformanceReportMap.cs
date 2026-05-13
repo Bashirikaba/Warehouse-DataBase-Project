@@ -8,19 +8,19 @@ public class StaffPerformanceReportMap : ClassMapping<StaffPerformanceReport>
     public StaffPerformanceReportMap()
     {
         Mutable(false);
-        Table("warehouse_period_map");
+        Table("staff_performance_report");
         ComposedId(map =>
         {
-            map.Property(p => p.FullName);
-            map.Property(p => p.WarehouseName);
+            map.Property(p => p.FullName, m => m.Column("full_name"));
+            map.Property(p => p.WarehouseName, m => m.Column("warehouse_name"));
         });
         Property(x => x.Position, m =>
         {
             m.Column("position");
         });
-        Property(x => x.DocumentProcessed, m =>
+        Property(x => x.DocumentsProcessed, m =>
         {
-            m.Column("document_processed");
+            m.Column("documents_processed");
         });
         Property(x => x.UniqueGoodsHandled, m =>
         {

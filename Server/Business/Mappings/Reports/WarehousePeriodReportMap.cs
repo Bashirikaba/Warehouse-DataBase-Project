@@ -8,13 +8,13 @@ public class WarehousePeriodReportMap : ClassMapping<WarehousePeriodReport>
     public WarehousePeriodReportMap()
     {
         Mutable(false);
-        Table("warehouse_period_map");
+        Table("warehouse_period_report");
         ComposedId(map =>
         {
-            map.Property(p => p.WarehouseName);
-            map.Property(p => p.Route);
-            map.Property(p => p.FirstDate);
-            map.Property(p => p.LastDate);
+            map.Property(p => p.WarehouseName, m => m.Column("warehouse_name"));
+            map.Property(p => p.Route, m => m.Column("route"));
+            map.Property(p => p.FirstDate, m => m.Column("first_date"));
+            map.Property(p => p.LastDate, m => m.Column("last_date"));
         });
         Property(x => x.InvoicesCount, m =>
         {

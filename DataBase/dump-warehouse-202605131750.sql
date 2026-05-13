@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict nw6nxW4LPYhjKv18GLYFxLoDbchN3cNbbSEltIGSUyQkCVG3JPVavUh4LmaisrR
+\restrict h01XPMjLQx19Jn39PTIWfBscEKMqVeQTkTxsGVl7CEPoaHG44N4eMXhQVTXa3VO
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
 
--- Started on 2026-05-10 22:23:12
+-- Started on 2026-05-13 17:50:50
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -31,9 +31,9 @@ CREATE DATABASE warehouse WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PRO
 
 ALTER DATABASE warehouse OWNER TO postgres;
 
-\unrestrict nw6nxW4LPYhjKv18GLYFxLoDbchN3cNbbSEltIGSUyQkCVG3JPVavUh4LmaisrR
+\unrestrict h01XPMjLQx19Jn39PTIWfBscEKMqVeQTkTxsGVl7CEPoaHG44N4eMXhQVTXa3VO
 \connect warehouse
-\restrict nw6nxW4LPYhjKv18GLYFxLoDbchN3cNbbSEltIGSUyQkCVG3JPVavUh4LmaisrR
+\restrict h01XPMjLQx19Jn39PTIWfBscEKMqVeQTkTxsGVl7CEPoaHG44N4eMXhQVTXa3VO
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -48,7 +48,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 237 (class 1255 OID 74098)
+-- TOC entry 236 (class 1255 OID 74098)
 -- Name: create_balance(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -68,7 +68,7 @@ $$;
 ALTER FUNCTION public.create_balance() OWNER TO postgres;
 
 --
--- TOC entry 236 (class 1255 OID 74096)
+-- TOC entry 237 (class 1255 OID 74096)
 -- Name: update_balances(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -76,7 +76,7 @@ CREATE FUNCTION public.update_balances() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-    IF NEW.route = 'Приход' THEN
+    IF NEW.route = 1 THEN
         INSERT INTO balances (warehouse_id, goods_id, quantity)
         VALUES (NEW.warehouse_id, NEW.goods_id, NEW.quantity)
         ON CONFLICT (warehouse_id, goods_id) 
@@ -419,6 +419,7 @@ INSERT INTO public.balances VALUES (6, 148, 6, 55);
 INSERT INTO public.balances VALUES (8, 148, 8, 640);
 INSERT INTO public.balances VALUES (11, 149, 11, 44);
 INSERT INTO public.balances VALUES (16, 149, 16, 150);
+INSERT INTO public.balances VALUES (54, 150, 3, 4);
 
 
 --
@@ -455,14 +456,11 @@ INSERT INTO public.goods VALUES (20, 'КН-005', '00405', 'Маркер перм
 -- Data for Name: invoice; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.invoice VALUES (1, 147, 1, 'INV01', '2026-03-01 00:00:00', 100, 43.00, 1);
 INSERT INTO public.invoice VALUES (2, 147, 2, 'INV02', '2026-03-02 00:00:00', 80, 59.50, 1);
 INSERT INTO public.invoice VALUES (3, 147, 3, 'INV03', '2026-03-05 00:00:00', 50, 118.00, 1);
 INSERT INTO public.invoice VALUES (4, 148, 6, 'INV04', '2026-03-10 00:00:00', 20, 1220.00, 1);
 INSERT INTO public.invoice VALUES (5, 148, 8, 'INV05', '2026-03-12 00:00:00', 200, 82.00, 1);
 INSERT INTO public.invoice VALUES (6, 149, 11, 'INV06', '2026-03-15 00:00:00', 30, 340.00, 1);
-INSERT INTO public.invoice VALUES (7, 149, 16, 'INV07', '2026-03-18 00:00:00', 60, 310.00, 1);
-INSERT INTO public.invoice VALUES (8, 149, 17, 'INV08', '2026-03-20 00:00:00', 200, 11.00, 1);
 INSERT INTO public.invoice VALUES (9, 147, 1, 'INV09', '2026-03-22 00:00:00', 50, 44.00, 2);
 INSERT INTO public.invoice VALUES (10, 147, 2, 'INV10', '2026-03-23 00:00:00', 50, 61.00, 2);
 INSERT INTO public.invoice VALUES (11, 147, 3, 'INV11', '2026-03-24 00:00:00', 30, 119.00, 2);
@@ -470,6 +468,8 @@ INSERT INTO public.invoice VALUES (12, 148, 6, 'INV12', '2026-03-25 00:00:00', 1
 INSERT INTO public.invoice VALUES (13, 148, 8, 'INV13', '2026-03-26 00:00:00', 60, 83.00, 2);
 INSERT INTO public.invoice VALUES (14, 149, 11, 'INV14', '2026-03-27 00:00:00', 10, 345.00, 2);
 INSERT INTO public.invoice VALUES (15, 149, 16, 'INV15', '2026-03-28 00:00:00', 20, 315.00, 2);
+INSERT INTO public.invoice VALUES (1, 147, 1, 'INV01', '2026-03-01 00:00:00', 100, 45.00, 1);
+INSERT INTO public.invoice VALUES (7, 149, 12, 'INV07', '2026-03-18 00:00:00', 60, 312.00, 1);
 
 
 --
@@ -518,6 +518,7 @@ INSERT INTO public.staff VALUES (65, 149, 26, 'Егорова Ольга Ива�
 INSERT INTO public.warehouses VALUES (147, 'Склад готовой продукции');
 INSERT INTO public.warehouses VALUES (148, 'Склад сырья и материалов');
 INSERT INTO public.warehouses VALUES (149, 'Склад запасных частей');
+INSERT INTO public.warehouses VALUES (150, 'Склад тест');
 
 
 --
@@ -526,7 +527,7 @@ INSERT INTO public.warehouses VALUES (149, 'Склад запасных част
 -- Name: balances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.balances_id_seq', 43, true);
+SELECT pg_catalog.setval('public.balances_id_seq', 55, true);
 
 
 --
@@ -544,7 +545,7 @@ SELECT pg_catalog.setval('public.goods_id_seq', 20, true);
 -- Name: invoice_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.invoice_id_seq', 15, true);
+SELECT pg_catalog.setval('public.invoice_id_seq', 22, true);
 
 
 --
@@ -580,7 +581,7 @@ SELECT pg_catalog.setval('public.staff_id_seq', 65, true);
 -- Name: warehouses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.warehouses_id_seq', 149, true);
+SELECT pg_catalog.setval('public.warehouses_id_seq', 150, true);
 
 
 --
@@ -844,11 +845,11 @@ ALTER TABLE ONLY public.staff
     ADD CONSTRAINT staff_position_id_fkey FOREIGN KEY (position_id) REFERENCES public.positions(id) ON DELETE RESTRICT;
 
 
--- Completed on 2026-05-10 22:23:13
+-- Completed on 2026-05-13 17:50:51
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict nw6nxW4LPYhjKv18GLYFxLoDbchN3cNbbSEltIGSUyQkCVG3JPVavUh4LmaisrR
+\unrestrict h01XPMjLQx19Jn39PTIWfBscEKMqVeQTkTxsGVl7CEPoaHG44N4eMXhQVTXa3VO
 

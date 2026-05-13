@@ -7,7 +7,7 @@ public class WarehousePeriodReport : IReport
 {
     public virtual required string WarehouseName { get; set; }
 
-    public virtual int Route { get; set; }
+    public virtual required string Route { get; set; }
 
     public virtual int InvoicesCount { get; set; }
 
