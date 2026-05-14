@@ -48,9 +48,10 @@ public class WarehousesService : IEntityService<WarehouseDto>
     {
         IQueryable<Warehouse> query = _warehouseRepository.Query();
 
-        if (dto != null && dto.StringParams != null)
+        if (dto != null)
         {
-            query = query.ApplyStringFilters(dto.StringParams);
+            if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.Select(g => new WarehouseDto

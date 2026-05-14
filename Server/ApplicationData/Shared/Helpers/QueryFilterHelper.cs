@@ -61,6 +61,27 @@ public static class QueryFilterHelper
         return query;
     }
 
+    public static IQueryable<T> ApplySorting<T>(this IQueryable<T> query, string sortExpression)
+    {
+        string[] parsedExpression = sortExpression.Split(' ');
+
+        string sortField = parsedExpression[0];
+
+        if (short.TryParse(parsedExpression[1], out short sortOrder))
+        {
+            string? sortLINQ = sortOrder switch
+            {
+                1 => sortField,
+                -1 => $"{sortField} desc",
+                _ => null
+            };
+
+            if (sortLINQ != null) query = query.OrderBy(sortLINQ);
+        }
+
+        return query;
+    }
+
     private static bool IsValidField<T>(string fieldName)
     {
         if (fieldName == "Id") return false;

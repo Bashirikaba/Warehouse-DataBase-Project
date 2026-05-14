@@ -45,9 +45,10 @@ public class PositionsService : IEntityService<PositionDto>
     {
         IQueryable<Position> query = _positionRepository.Query();
 
-        if (dto != null && dto.StringParams != null)
+        if (dto != null)
         {
-            query = query.ApplyStringFilters(dto.StringParams);
+            if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.Select(p => new PositionDto { Id = p.Id, Name = p.Name }).ToListAsync();

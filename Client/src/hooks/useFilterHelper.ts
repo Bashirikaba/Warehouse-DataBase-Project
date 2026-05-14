@@ -68,6 +68,7 @@ export default function useFilterHelper(): useFilterHelperProp {
       StringParams: filter.StringParams.filter((p) => p.Value),
       NumberParams: filter.NumberParams.filter((p) => p.Value !== null),
       DateParams: filter.DateParams.filter((p) => p.Value !== null),
+      SortExpression: filter.SortExpression,
     }
   }
 

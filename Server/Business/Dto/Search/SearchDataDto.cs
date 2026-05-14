@@ -9,4 +9,6 @@ public class SearchDataDto
     public NumberParam[]? NumberParams { get; set; }
     
     public DateParam[]? DateParams { get; set; }
+
+    public string? SortExpression {get; set;}
 }

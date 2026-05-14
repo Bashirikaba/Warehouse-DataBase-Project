@@ -55,6 +55,7 @@ public class GoodsService : IEntityService<GoodDto>
         {
             if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
             if (dto.NumberParams != null) query = query.ApplyNumberFilters(dto.NumberParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.Select(g => new GoodDto

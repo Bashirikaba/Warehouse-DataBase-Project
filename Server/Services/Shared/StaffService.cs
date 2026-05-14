@@ -56,9 +56,10 @@ public class StaffService : IEntityService<StaffDto>
     {
         IQueryable<Staff> query = _staffRepository.Query();
 
-        if (dto != null && dto.StringParams != null)
+        if (dto != null)
         {
-            query = query.ApplyStringFilters(dto.StringParams);
+            if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.Select(i => new StaffDto

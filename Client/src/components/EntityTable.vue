@@ -6,14 +6,13 @@ import { onMounted, reactive, ref, type Reactive, type Ref } from 'vue'
 import EnumFilterField from './EnumFilterField.vue'
 import EntityFormDialog from './EntityFormDialog.vue'
 import type { Service } from '@/types/types'
-const { initFilter, getStringParam, getNumberParam, getDateParam, getValidatedSearchData } =
-  useFilterHelper()
-
 interface IEntityTableProps {
   config: ITableConfigItem[]
   apiService: Service
 }
 
+const { initFilter, getStringParam, getNumberParam, getDateParam, getValidatedSearchData } =
+  useFilterHelper()
 const props = defineProps<IEntityTableProps>()
 const entities: Reactive<IEntity[]> = reactive([])
 const isEntitiesLoading: Ref<boolean> = ref(true)
@@ -24,19 +23,12 @@ const filter: Reactive<ISearchData> = reactive(initFilter(props.config))
 Api.setService(props.apiService)
 
 onMounted(() => {
-  getAllEntities()
+  getEntities()
 })
 
-async function getAllEntities() {
+async function getEntities() {
   isEntitiesLoading.value = true
-  const response: IEntity[] = await Api.getEntity<IEntity>()
 
-  Object.assign(entities, response)
-  isEntitiesLoading.value = false
-}
-
-async function getFilteredEntities() {
-  isEntitiesLoading.value = true
   const response: IEntity[] = await Api.getEntity<IEntity>(getValidatedSearchData(filter))
 
   entities.length = 0
@@ -46,7 +38,7 @@ async function getFilteredEntities() {
 
 async function deleteEntity(id: number) {
   await Api.deleteEntity(id)
-  await getAllEntities()
+  await getEntities()
 }
 
 function editEntity(entity: IEntity) {
@@ -58,11 +50,9 @@ function createEntity() {
   selectedEntity.value = undefined
   isDialogVisible.value = true
 }
-
-console.log(props.config)
 </script>
 <template>
-  <div @keydown.enter="getFilteredEntities()">
+  <div @keydown.enter="getEntities()">
     <div class="fields">
       <div class="filter" v-for="row in config.filter((r) => r.Field != 'Id')" :key="row.Field">
         <StringFilterField
@@ -88,7 +78,7 @@ console.log(props.config)
       </div>
     </div>
     <div style="display: flex; gap: 10px; margin-top: 1rem">
-      <Button icon="pi pi-search" label="Поиск" @click="getFilteredEntities()"></Button>
+      <Button icon="pi pi-search" label="Поиск" @click="getEntities()"></Button>
       <Button icon="pi pi-plus" text label="Создать запись" @click="createEntity()"></Button>
     </div>
     <Divider></Divider>
@@ -97,10 +87,18 @@ console.log(props.config)
       striped-rows
       size="small"
       :sort-order="-1"
+      sort-mode="single"
+      removable-sort
       show-gridlines
       data-key="Id"
       edit-mode="row"
       :loading="isEntitiesLoading"
+      @sort="
+        async (e) => {
+          filter.SortExpression = `${e.sortField} ${e.sortOrder}`
+          await getEntities()
+        }
+      "
     >
       <template #header>
         <div>Всего записей: {{ entities.length }}</div>
@@ -159,7 +157,7 @@ console.log(props.config)
       :edit-data="selectedEntity"
       :config="config"
       :api-service="props.apiService"
-      @update="getAllEntities()"
+      @update="getEntities()"
     ></EntityFormDialog>
   </div>
 </template>

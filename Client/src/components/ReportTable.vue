@@ -4,14 +4,14 @@ import useFilterHelper from '@/hooks/useFilterHelper'
 import type { IEntity, ISearchData, ITableConfigItem } from '@/types/interfaces'
 import { onMounted, reactive, ref, type Reactive, type Ref } from 'vue'
 import EnumFilterField from './EnumFilterField.vue'
-import type { Service } from '@/types/types'
+import type { ReportEndpoint, Service } from '@/types/types'
 const { initFilter, getStringParam, getNumberParam, getDateParam, getValidatedSearchData } =
   useFilterHelper()
 
 interface IReportTableProps {
   config: ITableConfigItem[]
   apiService: Service
-  report: Report
+  report: ReportEndpoint
 }
 
 const props = defineProps<IReportTableProps>()
@@ -27,14 +27,6 @@ onMounted(() => {
 
 async function buildReport() {
   isEntitiesLoading.value = true
-  const response: IEntity[] = await Api.getReport<IEntity>(props.report)
-
-  Object.assign(entities, response)
-  isEntitiesLoading.value = false
-}
-
-async function buildFilteredReport() {
-  isEntitiesLoading.value = true
   const response: IEntity[] = await Api.getReport<IEntity>(
     props.report,
     getValidatedSearchData(filter),
@@ -46,7 +38,7 @@ async function buildFilteredReport() {
 }
 </script>
 <template>
-  <div @keydown.enter="buildFilteredReport()">
+  <div @keydown.enter="buildReport()">
     <div class="fields">
       <div class="filter" v-for="row in config.filter((r) => r.Field != 'Id')" :key="row.Field">
         <StringFilterField
@@ -72,7 +64,7 @@ async function buildFilteredReport() {
       </div>
     </div>
     <div style="display: flex; gap: 10px; margin-top: 1rem">
-      <Button icon="pi pi-search" label="Поиск" @click="buildFilteredReport()"></Button>
+      <Button icon="pi pi-search" label="Поиск" @click="buildReport()"></Button>
     </div>
     <Divider></Divider>
     <DataTable
@@ -80,10 +72,18 @@ async function buildFilteredReport() {
       striped-rows
       size="small"
       :sort-order="-1"
+      sort-mode="single"
+      removable-sort
       show-gridlines
       data-key="Id"
       edit-mode="row"
       :loading="isEntitiesLoading"
+      @sort="
+        async (e) => {
+          filter.SortExpression = `${e.sortField} ${e.sortOrder}`
+          await buildReport()
+        }
+      "
     >
       <template #header>
         <div>Всего записей: {{ entities.length }}</div>

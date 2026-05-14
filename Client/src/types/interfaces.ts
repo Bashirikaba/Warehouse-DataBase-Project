@@ -95,6 +95,7 @@ export interface ISearchData {
   StringParams: IStringParam[]
   NumberParams: INumberParam[]
   DateParams: IDateParam[]
+  SortExpression?: string
 }
 
 export interface IDateParam {

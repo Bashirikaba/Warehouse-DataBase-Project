@@ -25,6 +25,7 @@ public class ReportsService : IReportService
         {
             if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
             if (dto.NumberParams != null) query = query.ApplyNumberFilters(dto.NumberParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.ToListAsync();
@@ -38,6 +39,7 @@ public class ReportsService : IReportService
             if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
             if (dto.NumberParams != null) query = query.ApplyNumberFilters(dto.NumberParams);
             if (dto.DateParams != null) query = query.ApplyDateFilters(dto.DateParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.ToListAsync();
@@ -51,6 +53,7 @@ public class ReportsService : IReportService
             if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
             if (dto.NumberParams != null) query = query.ApplyNumberFilters(dto.NumberParams);
             if (dto.DateParams != null) query = query.ApplyDateFilters(dto.DateParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.ToListAsync();

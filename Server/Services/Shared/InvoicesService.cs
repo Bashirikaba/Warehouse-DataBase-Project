@@ -64,6 +64,7 @@ public class InvoicesService : IEntityService<InvoiceDto>
             if (dto.StringParams != null) query = query.ApplyStringFilters(dto.StringParams);
             if (dto.NumberParams != null) query = query.ApplyNumberFilters(dto.NumberParams);
             if (dto.DateParams != null) query = query.ApplyDateFilters(dto.DateParams);
+            if (dto.SortExpression != null) query = query.ApplySorting(dto.SortExpression);
         }
 
         return await query.Select(i => new InvoiceDto

@@ -229,8 +229,8 @@ export const staffPerformanceReportConfig: ITableConfigItem[] = [
   },
   {
     Field: 'LastWorkDate',
-    Label: 'Продано за последние 30 дней',
-    Type: 'number',
+    Label: 'Дата последней смены',
+    Type: 'date',
   },
 ]
 

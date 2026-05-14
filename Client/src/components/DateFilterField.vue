@@ -15,7 +15,14 @@ defineProps<IDateFilterProps>()
 <template>
   <div class="filter-field">
     <FloatLabel variant="on">
-      <DatePicker size="large" v-model="param.Value" show-icon fluid :max-date="new Date()" />
+      <DatePicker
+        size="large"
+        v-model="param.Value"
+        show-icon
+        fluid
+        :max-date="new Date()"
+        date-format="dd.mm.yy"
+      />
       <label :for="uid">{{ label }}</label>
     </FloatLabel>
     <Select

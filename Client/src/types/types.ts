@@ -9,4 +9,4 @@ export type Service =
   | 'Warehouses'
   | 'Reports'
 
-export type Report = 'GetReorderGoods' | 'GetStaffPerformance' | 'GetWarehousePeriod'
+export type ReportEndpoint = 'GetReorderGoods' | 'GetStaffPerformance' | 'GetWarehousePeriod'
