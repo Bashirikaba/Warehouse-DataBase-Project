@@ -35,6 +35,7 @@ builder.Services.AddScoped(sp => NHibernateHelper.OpenSession());
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IReadOnlyRepository<>), typeof(ReadOnlyRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
@@ -58,5 +59,6 @@ app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseSwagger().UseSwaggerUI(c => {c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");});
 
 app.Run();

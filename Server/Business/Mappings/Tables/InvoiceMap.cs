@@ -1,8 +1,6 @@
-using Business.Enums;
 using Business.Models;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
-using NHibernate.Type;
 
 namespace Business.Mappings;
 
