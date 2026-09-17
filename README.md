@@ -1,5 +1,3 @@
-# TODO:
-- доработать валидацию,
-- поучиться докеру с этим репозиторием,
-- выложить на render,
-- попробовать redis
+- **Frontend**: Vue, TS, PrimeVue
+- **Backend**: C# JSON-RPC
+- **DB**: PostgreSQL
