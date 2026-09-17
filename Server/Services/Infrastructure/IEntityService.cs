@@ -2,7 +2,7 @@ using Business.Dto.Search;
 
 namespace Services.Infrastructure;
 
-public interface IEntityService<TDto>
+public interface IEntityService<TDto> : IServiceBase
 {
     Task<int?> Add(TDto dto);
 

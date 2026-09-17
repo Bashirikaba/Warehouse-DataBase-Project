@@ -3,7 +3,7 @@ using Business.Models;
 
 namespace Services.Infrastructure;
 
-public interface IReportService
+public interface IReportService : IServiceBase
 {
     Task<IReadOnlyList<ReorderGoodsReport>> GetReorderGoods(SearchDataDto? dto);
 

@@ -1,6 +1,5 @@
 using ApplicationData.Infrastructure;
 using ApplicationData.Shared.Helpers;
-using Business.Attributes;
 using Business.Dto;
 using Business.Dto.Search;
 using Business.Models;
@@ -9,7 +8,6 @@ using Services.Infrastructure;
 
 namespace Services.Shared;
 
-[AutoRoute]
 public class BalancesService : IEntityService<BalanceDto>
 {
     private IUnitOfWork _unitOfWork;
