@@ -1,5 +1,5 @@
 import type { IEntity, IEntityDto, ISearchData, ISearchDataDto } from '../types/interfaces'
-import type { Endpoint, Report, Service } from '../types/types'
+import type { Endpoint, ReportEndpoint, Service } from '../types/types'
 
 export default class Api {
   private static readonly baseUrl: string = 'http://localhost:5129/api'
@@ -11,7 +11,7 @@ export default class Api {
   }
 
   private static service: Service
-  private static endpoint: Endpoint | Report
+  private static endpoint: Endpoint | ReportEndpoint
 
   static setService(service: Service): void {
     this.service = service
@@ -76,7 +76,7 @@ export default class Api {
     await fetch(this.buildQuery(), filledBody)
   }
 
-  static async getReport<T>(report: Report, params?: ISearchData): Promise<T[]> {
+  static async getReport<T>(report: ReportEndpoint, params?: ISearchData): Promise<T[]> {
     let filledBody: RequestInit
     let response: Response
 
