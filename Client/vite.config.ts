@@ -17,6 +17,9 @@ export default defineConfig({
       resolvers: [PrimeVueResolver()],
     }),
   ],
+  server: {
+    host: '0.0.0.0'
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
